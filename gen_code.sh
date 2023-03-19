@@ -2,21 +2,21 @@
 
 CSV_SOURCE=https://docs.google.com/spreadsheets/d/1-6EV7ZmCIKY5moo7pextqfhPewN-1DB3yZNYqQXBMas
 CSR_LIST=./csr_list.csv
-OUT_FILE_DEF=./model/csr/include/csr_define.hcodal
+OUT_FILE_DEF=./modules/csr/include/csr_define.hcodal
 
-OUT_FILE_STRUCT=./model/csr/include/csr_struct.codal
-OUT_FILE_CSR_BANK=./model/csr/modules/csr_bank.codal
-OUT_FILE_CSR_PORT1=./model/csr/modules/csr_port_declare.txt
-OUT_FILE_CSR_PORT2=./model/csr/modules/csr_port_connect.txt
+OUT_FILE_STRUCT=./modules/csr/include/csr_struct.codal
+OUT_FILE_CSR_BANK=./modules/csr/modules/csr_bank.codal
+OUT_FILE_CSR_PORT1=./modules/csr/modules/csr_port_declare.txt
+OUT_FILE_CSR_PORT2=./modules/csr/modules/csr_port_connect.txt
 
-OUT_FILE_STRUCT_32=./model/csr/include/csr_struct_32.codal
-OUT_FILE_CSR_BANK_32=./model/csr/modules/csr_bank_32.codal
-OUT_FILE_CSR_PORT1_32=./model/csr/modules/csr_port_declare_32.txt
-OUT_FILE_CSR_PORT2_32=./model/csr/modules/csr_port_connect_32.txt
+OUT_FILE_STRUCT_32=./modules/csr/include/csr_struct_32.codal
+OUT_FILE_CSR_BANK_32=./modules/csr/modules/csr_bank_32.codal
+OUT_FILE_CSR_PORT1_32=./modules/csr/modules/csr_port_declare_32.txt
+OUT_FILE_CSR_PORT2_32=./modules/csr/modules/csr_port_connect_32.txt
 
 # Download and export to CSV
 curl -Lo $CSR_LIST "$CSV_SOURCE/export?gid=230178269&format=csv"
-echo "Orginal CSV tables downloaded from https://docs.google.com/spreadsheets/d/1-6EV7ZmCIKY5moo7pextqfhPewN-1DB3yZNYqQXBMas"
+# echo "Orginal CSV tables downloaded from https://docs.google.com/spreadsheets/d/1-6EV7ZmCIKY5moo7pextqfhPewN-1DB3yZNYqQXBMas"
 
 #Generate struct code from $CSR_LIST
 rm $OUT_FILE_DEF
