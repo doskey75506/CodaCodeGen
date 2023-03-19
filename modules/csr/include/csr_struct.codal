@@ -1,0 +1,311 @@
+
+struct fcsr_t
+    {
+            uint5           fflags;
+            uint3           frm;
+};
+
+
+struct vcsr_t
+    {
+            uint1           vxsat;
+            uint2           vxrm;
+};
+
+
+struct stvec_t
+    {
+            uint1           mode;
+            uint60          base;
+};
+
+
+struct scounteren_t
+    {
+            uint1           cy;
+            uint1           tm;
+            uint1           ir;
+            uint4           hpm6_3;
+};
+
+
+struct sepc_t
+    {
+            uint63          epc;
+};
+
+
+struct scause_t
+    {
+            uint63          expt;
+            uint1           intr;
+};
+
+
+struct satp_t
+    {
+            uint44          ppn;
+            uint16          asid;
+            uint4           mode;
+};
+
+
+struct mstatus_t
+    {
+            uint1           sie;
+            uint1           mie;
+            uint1           spie;
+            uint1           ube;
+            uint1           mpie;
+            uint1           spp;
+            uint2           vs;
+            uint2           mpp;
+            uint2           fs;
+            uint2           xs;
+            uint1           mprv;
+            uint1           sum;
+            uint1           mxr;
+            uint1           tvm;
+            uint1           tw;
+            uint1           tsr;
+            uint2           uxl;
+            uint2           sxl;
+            uint1           sbe;
+            uint1           mbe;
+            uint1           sd;
+};
+
+
+struct misa_t
+    {
+            uint1           a;
+            uint1           b;
+            uint1           c;
+            uint1           d;
+            uint1           e;
+            uint1           f;
+            uint1           g;
+            uint1           h;
+            uint1           i;
+            uint1           j;
+            uint1           k;
+            uint1           l;
+            uint1           m;
+            uint1           n;
+            uint1           o;
+            uint1           p;
+            uint1           q;
+            uint1           r;
+            uint1           s;
+            uint1           t;
+            uint1           u;
+            uint1           v;
+            uint1           w;
+            uint1           x;
+            uint1           y;
+            uint1           z;
+            uint2           mxl;
+};
+
+
+struct medeleg_t
+    {
+            uint16          expt;
+};
+
+
+struct mideleg_t
+    {
+            uint1           ssid;
+            uint1           msid;
+            uint1           stid;
+            uint1           mtid;
+            uint1           seid;
+            uint1           meid;
+};
+
+
+struct mie_t
+    {
+            uint1           ssie;
+            uint1           msie;
+            uint1           stie;
+            uint1           mtie;
+            uint1           seie;
+            uint1           meie;
+};
+
+
+struct mtvec_t
+    {
+            uint1           mode;
+            uint60          base;
+};
+
+
+struct mcounteren_t
+    {
+            uint1           cy;
+            uint1           tm;
+            uint1           ir;
+            uint4           hpm6_3;
+};
+
+
+struct mcountinhibit_t
+    {
+            uint1           cy;
+            uint1           ir;
+            uint4           hpm6_3;
+};
+
+
+struct mhpmevent3_t
+    {
+            uint12          evt;
+};
+
+
+struct mhpmevent4_t
+    {
+            uint12          evt;
+};
+
+
+struct mhpmevent5_t
+    {
+            uint12          evt;
+};
+
+
+struct mhpmevent6_t
+    {
+            uint12          evt;
+};
+
+
+struct mepc_t
+    {
+            uint63          epc;
+};
+
+
+struct mcause_t
+    {
+            uint63          expt;
+            uint1           intr;
+};
+
+
+struct mip_t
+    {
+            uint1           ssip;
+            uint1           msip;
+            uint1           stip;
+            uint1           mtip;
+            uint1           seip;
+            uint1           meip;
+};
+
+
+struct sbpredctrl_t
+    {
+            uint1           flush_bpred;
+};
+
+
+struct tselect_t
+    {
+            uint2           idx;
+};
+
+
+struct dcsr_t
+    {
+            uint2           prv;
+            uint1           step;
+            uint1           nmip;
+            uint1           mprven;
+            uint1           v;
+            uint3           cause;
+            uint1           stoptime;
+            uint1           stopcount;
+            uint1           stepie;
+            uint1           ebreaku;
+            uint1           ebreaks;
+            uint1           ebreakm;
+            uint1           ebreakvu;
+            uint1           ebreakvs;
+            uint4           debugver;
+};
+
+
+struct dpc_t
+    {
+            uint63          dpc;
+};
+
+
+struct mcfgctrl_t
+    {
+            uint1           dis_late_alu;
+            uint1           dis_all_dual_issue;
+            uint1           dis_alu_agu_dual_issue;
+            uint1           dis_mv_dual_issue;
+            uint1           dis_alu_logic_dual_issue;
+            uint1           dis_slot1;
+            uint1           dis_spec_state_issue;
+            uint1           dis_br_pred;
+            uint1           dis_large_tlb_page;
+};
+
+
+struct mcachestatus_t
+    {
+            uint1           icache_disabled;
+            uint1           icache_pref_disabled;
+            uint1           dcache_disabled;
+            uint1           dcache_pref_disabled;
+            uint1           l2cache_disabled;
+            uint1           wfi_stop_mode;
+};
+
+
+struct mdcachectrl_t
+    {
+            uint4           manage_dcache;
+};
+
+
+struct micachectrl_t
+    {
+            uint3           manage_icache;
+};
+
+
+struct ml2cachectrl_t
+    {
+            uint4           manage_l2cache;
+};
+
+
+struct vtype_t
+    {
+            uint3           vlmul;
+            uint3           vsew;
+            uint1           vta;
+            uint1           vma;
+            uint1           vill;
+};
+
+
+struct marchid_t
+    {
+            uint4           obilix;
+            uint4           archt;
+            uint4           fusa;
+            uint4           cheri;
+            uint4           vector;
+            uint1           preset;
+};
+

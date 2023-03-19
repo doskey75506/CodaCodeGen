@@ -21,7 +21,7 @@ if __name__ == "__main__":
         #generate code
 
         #collect info on every row read from the CSR table; generate csr_define.codal
-        with open(output_file_define, mode='w', newline = '') as codal_def:
+        with open(output_file_define, mode='w', newline='') as codal_def:
           
           first_item = [True]
           for row in reader:
