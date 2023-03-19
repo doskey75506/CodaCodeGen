@@ -41,43 +41,22 @@ def marchid_reset():
   return reset_value;
 
 
-#Jiali
 #Example: name_str='NAME<3-6>', addr_str='0x303-0x306'
 def parse_name(name_str, addr_str):
-  # name_list=[]
-  # addr_list=[]
-  # name_split=re.split('[<>-]', name_str)
-  # addr_split=re.split('[x-]', addr_str)
-  # j=0
-  # for i in range(int(name_split[1]), int(name_split[2])+1):
-  #   if (name_split[3] == ''):
-  #     name=f'{name_split[0]}{i}'
-  #   else:
-  #     name=f'{name_split[0]}{i}{name_split[3]}'
-  #   addr=hex(int(addr_split[1], 16)+j)
-  #   j += 1
-  #   name_list.append(name)
-  #   addr_list.append(addr)
-  # return name_list, addr_list
-
-  # Process name_str
-  if re.match(".+<.+-.+>*", name_str):
-    name_split = re.split('[<>-]', name_str)
-    name_list = [f'{name_split[0]}{i}{name_split[3]}' for i in range(int(name_split[1]), int(name_split[2]) + 1)]
-  else:
-    print("parse_name error: The input name_str must be NAME<x-y>")
-    name_list = []
-
-  # Process Addr_str
-  if re.match("0x[0-9a-fA-F]+-0x[0-9a-fA-F]+", addr_str):
-    addr_split = re.split('[x-]', addr_str)
-    addr_list = [hex(addr) for addr in range(int(addr_split[1],base=16), int(addr_split[3], base=16)+1)]
-  else:
-    print("parse_name error: The input name_str must be '0x303-0x306'")
-    addr_list = []
-
-  if (len(name_list) != len(addr_list)):
-    print("Name list has different length with addr list")
+  name_list=[]
+  addr_list=[]
+  name_split=re.split('[<>-]', name_str)
+  addr_split=re.split('[x-]', addr_str)
+  j=0
+  for i in range(int(name_split[1]), int(name_split[2])+1):
+    if (name_split[3] == ''):
+      name=f'{name_split[0]}{i}'
+    else:
+      name=f'{name_split[0]}{i}{name_split[3]}'
+    addr=hex(int(addr_split[1], 16)+j)
+    j += 1
+    name_list.append(name)
+    addr_list.append(addr)
   return name_list, addr_list
 
 # ------------ dynamic enable input declare ------------

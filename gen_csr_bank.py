@@ -138,34 +138,26 @@ module csr_bank_t
             #If both Enable/Disable values are equal, no need to create Access Enable inputs
             rowx_enable_access = row[header.index('Access Enable')]
             rowx_disable_access = row[header.index('Disable Action')]
-
-            #Jiali
-            rowx_enable = 1 if rowx_enable_access not in ['', '-'] else 0
-            # if row[header.index('Access Enable')] not in ['', '-']:
-            #   rowx_enable = 1
-            # else:
-            #   rowx_enable = 0
-
+            if row[header.index('Access Enable')] not in ['', '-']:
+              rowx_enable = 1
+            else:
+              rowx_enable = 0
             rowx_ro = (row[header.index('Field Type')] == 'RO')
-
-            value_A71_H71 = row[header.index('A71/H71')]
-
-            # Jiali: Line 152 - 158
+                
             if dict_reg_len["XLEN"] == 64:
-                rowx_prj_ro = (value_A71_H71 in ['RO', 'ROZ'])
+                rowx_prj_ro = (row[header.index('A71/H71')] == 'RO' or row[header.index('A71/H71')] == 'ROZ')
                 rowx_prj_roz = (row[header.index('A71/H71')] == 'ROZ')
             else:
-                rowx_prj_ro = (row[header.index('L71')] == 'RO' or value_A71_H71 == 'ROZ')
-                rowx_prj_roz = (value_A71_H71 == 'ROZ')
+                rowx_prj_ro = (row[header.index('L71')] == 'RO' or row[header.index('A71/H71')] == 'ROZ')
+                rowx_prj_roz = (row[header.index('A71/H71')] == 'ROZ')
 
-
+        
             #generate valid CSRs (not related to structured/unstructured declaration)
-            if value_A71_H71 not in ['', '-'] and row[header.index('Shadow of')] in ['', '-']:
+            if row[header.index('A71/H71')] not in ['', '-'] and row[header.index('Shadow of')] in ['', '-']:
 
               #declare dynamic enable inputs
               csr_bank_func_rd_instr_io += gen_rd_enable(rowx_name, rowx_enable)
-              # Jiali :  rowx_enable will always be 1 here, because same condition in line 163 and 143
-
+      
               #generate structured CSRs
               if row[header.index('Field Access')].lower() == 'yes':
                 if rowx_name.find('<') != -1:#Name contains '<'
