@@ -1,0 +1,1486 @@
+
+
+#include "shared_defines.hcodal"
+#include "csr_define.hcodal"
+
+#define SXLEN           XLEN
+#define MXLEN           XLEN
+#define DXLEN           XLEN
+#define VLEN            OPTION_VLEN
+#define TRIGGERS        4
+
+module csr_bank_t
+{
+    public register struct fcsr_t                   r_fcsr              { default = {0,0}; };                                                   //0x003
+    public register uint_<{clog2(VLEN)}>            r_vstart            { default = 0; };                                                       //0x008
+    public register struct vcsr_t                   r_vcsr              { default = {0,0}; };                                                   //0x00f
+    public register struct stvec_t                  r_stvec             { reset = false; };                                                     //0x105
+    public register struct scounteren_t             r_scounteren        { default = {0,0,0,0}; };                                               //0x106
+    public register uint_<{SXLEN}>                  r_senvcfg           { default = 0; };                                                       //0x10a
+    public register uint_<{SXLEN}>                  r_sscratch          { default = 0; };                                                       //0x140
+    public register struct sepc_t                   r_sepc              { default = {0}; };                                                     //0x141
+    public register struct scause_t                 r_scause            { reset = false; };                                                     //0x142
+    public register uint_<{SXLEN}>                  r_stval             { reset = false; };                                                     //0x143
+    public register struct satp_t                   r_satp              { default = {0,0,0}; };                                                 //0x180
+    public register struct mstatus_t                r_mstatus           { default = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0}; };             //0x300
+    public register struct misa_t                   r_misa              { default = {1,0,1,1,0,1,0,0,1,0,0,0,1,0,0,0,0,0,1,0,1,0,0,1,0,0,2}; }; //0x301
+    public register struct medeleg_t                r_medeleg           { default = {0}; };                                                     //0x302
+    public register struct mideleg_t                r_mideleg           { default = {0,0,0,0,0,0}; };                                           //0x303
+    public register struct mie_t                    r_mie               { default = {0,0,0,0,0,0}; };                                           //0x304
+    public register struct mtvec_t                  r_mtvec             { reset = false; };                                                     //0x305
+    public register struct mcounteren_t             r_mcounteren        { default = {0,0,0,0}; };                                               //0x306
+    public register uint_<{MXLEN}>                  r_menvcfg           { default = 0; };                                                       //0x30a
+    public register struct mcountinhibit_t          r_mcountinhibit     { default = {0,0,0}; };                                                 //0x320
+    public register struct mhpmevent3_t             r_mhpmevent3        { reset = false; };                                                     //0x323
+    public register struct mhpmevent4_t             r_mhpmevent4        { reset = false; };                                                     //0x324
+    public register struct mhpmevent5_t             r_mhpmevent5        { reset = false; };                                                     //0x325
+    public register struct mhpmevent6_t             r_mhpmevent6        { reset = false; };                                                     //0x326
+    public register uint_<{MXLEN}>                  r_mscratch          { default = 0; };                                                       //0x340
+    public register struct mepc_t                   r_mepc              { default = {0}; };                                                     //0x341
+    public register struct mcause_t                 r_mcause            { reset = false; };                                                     //0x342
+    public register uint_<{MXLEN}>                  r_mtval             { reset = false; };                                                     //0x343
+    public register struct mip_t                    r_mip               { default = {0,0,0,0,0,0}; };                                           //0x344
+    public register uint_<{MXLEN}>                  r_pmpcfg0           { default = 0; };                                                       //0x3a0
+    public register uint_<{MXLEN}>                  r_pmpcfg2           { default = 0; };                                                       //0x3a2
+    public register uint_<{MXLEN}>                  r_pmpcfg4           { default = 0; };                                                       //0x3a4
+    public register uint_<{MXLEN}>                  r_pmpcfg6           { default = 0; };                                                       //0x3a6
+    public register uint_<{MXLEN}>                  r_pmpaddr0          { reset = false; };                                                     //0x3b0
+    public register uint_<{MXLEN}>                  r_pmpaddr1          { reset = false; };                                                     //0x3b1
+    public register uint_<{MXLEN}>                  r_pmpaddr2          { reset = false; };                                                     //0x3b2
+    public register uint_<{MXLEN}>                  r_pmpaddr3          { reset = false; };                                                     //0x3b3
+    public register uint_<{MXLEN}>                  r_pmpaddr4          { reset = false; };                                                     //0x3b4
+    public register uint_<{MXLEN}>                  r_pmpaddr5          { reset = false; };                                                     //0x3b5
+    public register uint_<{MXLEN}>                  r_pmpaddr6          { reset = false; };                                                     //0x3b6
+    public register uint_<{MXLEN}>                  r_pmpaddr7          { reset = false; };                                                     //0x3b7
+    public register uint_<{MXLEN}>                  r_pmpaddr8          { reset = false; };                                                     //0x3b8
+    public register uint_<{MXLEN}>                  r_pmpaddr9          { reset = false; };                                                     //0x3b9
+    public register uint_<{MXLEN}>                  r_pmpaddr10         { reset = false; };                                                     //0x3ba
+    public register uint_<{MXLEN}>                  r_pmpaddr11         { reset = false; };                                                     //0x3bb
+    public register uint_<{MXLEN}>                  r_pmpaddr12         { reset = false; };                                                     //0x3bc
+    public register uint_<{MXLEN}>                  r_pmpaddr13         { reset = false; };                                                     //0x3bd
+    public register uint_<{MXLEN}>                  r_pmpaddr14         { reset = false; };                                                     //0x3be
+    public register uint_<{MXLEN}>                  r_pmpaddr15         { reset = false; };                                                     //0x3bf
+    public register struct sbpredctrl_t             r_sbpredctrl        { default = {0}; };                                                     //0x5e8
+    public register struct tselect_t                r_tselect           { reset = false; };                                                     //0x7a0
+    public register uint_<{XLEN}>                   r_tdata1[TRIGGERS]  { default = 0; };                                                       //0x7a1
+    public register uint_<{XLEN}>                   r_tdata2[TRIGGERS]  { reset = false; };                                                     //0x7a2
+    public register uint_<{XLEN}>                   r_tinfo             { default = 0x40; };                                                    //0x7a4
+    public register struct dcsr_t                   r_dcsr              { default = {3,0,0,0,0,0,0,0,0,0,0,0,0,0,4}; };                         //0x7b0
+    public register struct dpc_t                    r_dpc               { default = {0}; };                                                     //0x7b1
+    public register uint_<{DXLEN}>                  r_dscratch0         { reset = false; };                                                     //0x7b2
+    public register uint_<{DXLEN}>                  r_dscratch1         { reset = false; };                                                     //0x7b3
+    public register struct mcfgctrl_t               r_mcfgctrl          { default = {0,1,0,0,0,0,0,0,0}; };                                     //0x7e0
+    public register struct mcachestatus_t           r_mcachestatus      { default = {0,0,0,0,0,0}; };                                           //0x7e4
+    public register struct mdcachectrl_t            r_mdcachectrl       { default = {0}; };                                                     //0x7e5
+    public register struct micachectrl_t            r_micachectrl       { default = {0}; };                                                     //0x7e6
+    public register struct ml2cachectrl_t           r_ml2cachectrl      { default = {0}; };                                                     //0x7e7
+    public register uint_<{MXLEN}>                  r_mcycle            { default = 0; };                                                       //0xb00
+    public register uint_<{MXLEN}>                  r_minstret          { default = 0; };                                                       //0xb02
+    public register uint_<{MXLEN}>                  r_mhpmcounter3      { default = 0; };                                                       //0xb03
+    public register uint_<{MXLEN}>                  r_mhpmcounter4      { default = 0; };                                                       //0xb04
+    public register uint_<{MXLEN}>                  r_mhpmcounter5      { default = 0; };                                                       //0xb05
+    public register uint_<{MXLEN}>                  r_mhpmcounter6      { default = 0; };                                                       //0xb06
+    public register uint_<{XLEN}>                   r_vl                { default = 128; };                                                     //0xc20
+    public register struct vtype_t                  r_vtype             { default = {0,0,0,0,1}; };                                             //0xc21
+    public register uint_<{XLEN}>                   r_vlenb             { default = 16; };                                                      //0xc22
+    public register uint32                          r_mvendorid         { default = 0x503; };                                                   //0xf11
+    public register struct marchid_t                r_marchid           { default = {5, //obilix
+                                                                  #if (OPTION_XLEN == 64)
+                                                                      #ifdef OPTION_HAS_VM
+                                                                                     5, //arch: rv64/VM (A71)
+                                                                      #else
+                                                                                     4, //arch: rv64/noVM (H71)
+                                                                      #endif
+                                                                  #else
+                                                                                     0, //arch: rv32/noVM (L71)
+                                                                  #endif
+                                                                                     0, //fusa
+                                                                  #ifdef OPTION_HAS_CHERI
+                                                                                     1, //cheri on
+                                                                  #else
+                                                                                     0, //cheri off
+                                                                  #endif
+                                                                  #ifdef OPTION_EXTENSION_V
+                                                                      #if (OPTION_VLEN == 128)
+                                                                                     1, //vector128
+                                                                      #else
+                                                                                     2, //vector256
+                                                                      #endif
+                                                                  #else
+                                                                                     0, //no vector
+                                                                  #endif
+                                                                                     1}; }; //0xf12
+    public register uint_<{MXLEN}>                  r_mimpid            { default = 0x000; };                                                   //0xf13
+    public register uint_<{MXLEN}>                  r_mhartid           { reset = false; };                                                     //0xf14
+    public register uint_<{MXLEN}>                  r_mconfigptr        { reset = false; };                                                     //0xf15
+
+    public always void rd_access(
+        //input
+        uint1               read,
+        uint12              raddr,
+        //dynamic enables
+        uint1               fcsr_en,
+        uint1               vstart_en,
+        uint1               vcsr_en,
+        uint1               pmpcfg0_en,
+        uint1               pmpcfg2_en,
+        uint1               pmpcfg4_en,
+        uint1               pmpcfg6_en,
+        uint16              pmpaddr_15_0_en,
+        uint1               vl_en,
+        uint1               vtype_en,
+        uint1               vlenb_en,
+
+        //output
+        uint64&             rdata,
+        uint1&              read_err,
+        uint1&              read_only)
+    {
+
+        read_err = 0;
+        read_only = 0;
+        
+        if (read)
+        {
+            switch (raddr)
+            {
+                case CSR_FCSR:          if(fcsr_en) {
+                                            rdata = (uint24)0 :: r_fcsr.frm :: r_fcsr.fflags;
+                                        }
+                                        else {
+                                            read_err = 1; //Access is disabled. Register is reserved.
+                                        }
+                                        break;
+                case CSR_VSTART:        if(vstart_en) {
+                                            rdata = r_vstart;
+                                        }
+                                        else {
+                                            read_err = 1;
+                                        }                                                               break;
+                case CSR_VCSR:          if(vcsr_en) {
+                                            rdata = r_vcsr.vxrm :: r_vcsr.vxsat;
+                                        }
+                                        else {
+                                            read_err = 1; //Access is disabled. Register is reserved.
+                                        }
+                                        break;
+                case CSR_STVEC:         rdata = r_stvec.base :: (uint3)0 :: r_stvec.mode;
+                                        break;
+                case CSR_SCOUNTEREN:    rdata = (uint25)0 :: r_scounteren.hpm6_3 :: r_scounteren.ir :: r_scounteren.tm :: r_scounteren.cy;
+                                        break;
+                case CSR_SENVCFG:       rdata = r_senvcfg;                                              break;
+                case CSR_SSCRATCH:      rdata = r_sscratch;                                             break;
+                case CSR_SEPC:          rdata = r_sepc.epc :: (uint1)0;
+                                        break;
+                case CSR_SCAUSE:        rdata = r_scause.intr :: r_scause.expt;
+                                        break;
+                case CSR_STVAL:         rdata = r_stval;                                                break;
+                case CSR_SATP:          rdata = r_satp.mode :: r_satp.asid :: r_satp.ppn;
+                                        break;
+                case CSR_MSTATUS:       rdata = r_mstatus.sd :: (uint25)0 :: r_mstatus.mbe :: r_mstatus.sbe :: r_mstatus.sxl :: r_mstatus.uxl :: (uint9)0 :: r_mstatus.tsr :: r_mstatus.tw :: r_mstatus.tvm :: r_mstatus.mxr :: r_mstatus.sum :: r_mstatus.mprv :: r_mstatus.xs :: r_mstatus.fs :: r_mstatus.mpp :: r_mstatus.vs :: r_mstatus.spp :: r_mstatus.mpie :: r_mstatus.ube :: r_mstatus.spie :: (uint1)0 :: r_mstatus.mie :: (uint1)0 :: r_mstatus.sie :: (uint1)0;
+                                        break;
+                case CSR_MISA:          rdata = r_misa.mxl :: (uint36)0 :: r_misa.z :: r_misa.y :: r_misa.x :: r_misa.w :: r_misa.v :: r_misa.u :: r_misa.t :: r_misa.s :: r_misa.r :: r_misa.q :: r_misa.p :: r_misa.o :: r_misa.n :: r_misa.m :: r_misa.l :: r_misa.k :: r_misa.j :: r_misa.i :: r_misa.h :: r_misa.g :: r_misa.f :: r_misa.e :: r_misa.d :: r_misa.c :: r_misa.b :: r_misa.a;
+                                        break;
+                case CSR_MEDELEG:       rdata = (uint48)0 :: r_medeleg.expt;
+                                        break;
+                case CSR_MIDELEG:       rdata = (uint52)0 :: r_mideleg.meid :: (uint1)0 :: r_mideleg.seid :: (uint1)0 :: r_mideleg.mtid :: (uint1)0 :: r_mideleg.stid :: (uint1)0 :: r_mideleg.msid :: (uint1)0 :: r_mideleg.ssid :: (uint1)0;
+                                        break;
+                case CSR_MIE:           rdata = (uint52)0 :: r_mie.meie :: (uint1)0 :: r_mie.seie :: (uint1)0 :: r_mie.mtie :: (uint1)0 :: r_mie.stie :: (uint1)0 :: r_mie.msie :: (uint1)0 :: r_mie.ssie :: (uint1)0;
+                                        break;
+                case CSR_MTVEC:         rdata = r_mtvec.base :: (uint3)0 :: r_mtvec.mode;
+                                        break;
+                case CSR_MCOUNTEREN:    rdata = (uint25)0 :: r_mcounteren.hpm6_3 :: r_mcounteren.ir :: r_mcounteren.tm :: r_mcounteren.cy;
+                                        break;
+                case CSR_MENVCFG:       rdata = r_menvcfg;                                              break;
+                case CSR_MCOUNTINHIBIT: rdata = (uint25)0 :: r_mcountinhibit.hpm6_3 :: r_mcountinhibit.ir :: (uint1)0 :: r_mcountinhibit.cy;
+                                        break;
+                case CSR_MHPMEVENT3:    rdata = (uint52)0 :: r_mhpmevent3.evt;
+                                        break;
+                case CSR_MHPMEVENT4:    rdata = (uint52)0 :: r_mhpmevent4.evt;
+                                        break;
+                case CSR_MHPMEVENT5:    rdata = (uint52)0 :: r_mhpmevent5.evt;
+                                        break;
+                case CSR_MHPMEVENT6:    rdata = (uint52)0 :: r_mhpmevent6.evt;
+                                        break;
+                case CSR_MHPMEVENT7:    rdata = 0;                                                      break;
+                case CSR_MHPMEVENT8:    rdata = 0;                                                      break;
+                case CSR_MHPMEVENT9:    rdata = 0;                                                      break;
+                case CSR_MHPMEVENT10:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT11:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT12:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT13:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT14:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT15:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT16:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT17:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT18:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT19:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT20:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT21:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT22:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT23:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT24:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT25:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT26:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT27:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT28:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT29:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT30:   rdata = 0;                                                      break;
+                case CSR_MHPMEVENT31:   rdata = 0;                                                      break;
+                case CSR_MSCRATCH:      rdata = r_mscratch;                                             break;
+                case CSR_MEPC:          rdata = r_mepc.epc :: (uint1)0;
+                                        break;
+                case CSR_MCAUSE:        rdata = r_mcause.intr :: r_mcause.expt;
+                                        break;
+                case CSR_MTVAL:         rdata = r_mtval;                                                break;
+                case CSR_MIP:           rdata = (uint52)0 :: r_mip.meip :: (uint1)0 :: r_mip.seip :: (uint1)0 :: r_mip.mtip :: (uint1)0 :: r_mip.stip :: (uint1)0 :: r_mip.msip :: (uint1)0 :: r_mip.ssip :: (uint1)0;
+                                        break;
+                case CSR_PMPCFG0:       if(pmpcfg0_en) {
+                                            rdata = r_pmpcfg0;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPCFG2:       if(pmpcfg2_en) {
+                                            rdata = r_pmpcfg2;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPCFG4:       if(pmpcfg4_en) {
+                                            rdata = r_pmpcfg4;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPCFG6:       if(pmpcfg6_en) {
+                                            rdata = r_pmpcfg6;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPCFG8:       rdata = 0;                                                      break;
+                case CSR_PMPCFG10:      rdata = 0;                                                      break;
+                case CSR_PMPCFG12:      rdata = 0;                                                      break;
+                case CSR_PMPCFG14:      rdata = 0;                                                      break;
+                case CSR_PMPADDR0:      if(pmpaddr_15_0_en[0]) {
+                                            rdata = r_pmpaddr0;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR1:      if(pmpaddr_15_0_en[1]) {
+                                            rdata = r_pmpaddr1;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR2:      if(pmpaddr_15_0_en[2]) {
+                                            rdata = r_pmpaddr2;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR3:      if(pmpaddr_15_0_en[3]) {
+                                            rdata = r_pmpaddr3;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR4:      if(pmpaddr_15_0_en[4]) {
+                                            rdata = r_pmpaddr4;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR5:      if(pmpaddr_15_0_en[5]) {
+                                            rdata = r_pmpaddr5;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR6:      if(pmpaddr_15_0_en[6]) {
+                                            rdata = r_pmpaddr6;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR7:      if(pmpaddr_15_0_en[7]) {
+                                            rdata = r_pmpaddr7;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR8:      if(pmpaddr_15_0_en[8]) {
+                                            rdata = r_pmpaddr8;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR9:      if(pmpaddr_15_0_en[9]) {
+                                            rdata = r_pmpaddr9;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR10:     if(pmpaddr_15_0_en[10]) {
+                                            rdata = r_pmpaddr10;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR11:     if(pmpaddr_15_0_en[11]) {
+                                            rdata = r_pmpaddr11;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR12:     if(pmpaddr_15_0_en[12]) {
+                                            rdata = r_pmpaddr12;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR13:     if(pmpaddr_15_0_en[13]) {
+                                            rdata = r_pmpaddr13;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR14:     if(pmpaddr_15_0_en[14]) {
+                                            rdata = r_pmpaddr14;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR15:     if(pmpaddr_15_0_en[15]) {
+                                            rdata = r_pmpaddr15;
+                                        }
+                                        else {
+                                            rdata = 0;
+                                        }                                                               break;
+                case CSR_PMPADDR16:     rdata = 0;                                                      break;
+                case CSR_PMPADDR17:     rdata = 0;                                                      break;
+                case CSR_PMPADDR18:     rdata = 0;                                                      break;
+                case CSR_PMPADDR19:     rdata = 0;                                                      break;
+                case CSR_PMPADDR20:     rdata = 0;                                                      break;
+                case CSR_PMPADDR21:     rdata = 0;                                                      break;
+                case CSR_PMPADDR22:     rdata = 0;                                                      break;
+                case CSR_PMPADDR23:     rdata = 0;                                                      break;
+                case CSR_PMPADDR24:     rdata = 0;                                                      break;
+                case CSR_PMPADDR25:     rdata = 0;                                                      break;
+                case CSR_PMPADDR26:     rdata = 0;                                                      break;
+                case CSR_PMPADDR27:     rdata = 0;                                                      break;
+                case CSR_PMPADDR28:     rdata = 0;                                                      break;
+                case CSR_PMPADDR29:     rdata = 0;                                                      break;
+                case CSR_PMPADDR30:     rdata = 0;                                                      break;
+                case CSR_PMPADDR31:     rdata = 0;                                                      break;
+                case CSR_PMPADDR32:     rdata = 0;                                                      break;
+                case CSR_PMPADDR33:     rdata = 0;                                                      break;
+                case CSR_PMPADDR34:     rdata = 0;                                                      break;
+                case CSR_PMPADDR35:     rdata = 0;                                                      break;
+                case CSR_PMPADDR36:     rdata = 0;                                                      break;
+                case CSR_PMPADDR37:     rdata = 0;                                                      break;
+                case CSR_PMPADDR38:     rdata = 0;                                                      break;
+                case CSR_PMPADDR39:     rdata = 0;                                                      break;
+                case CSR_PMPADDR40:     rdata = 0;                                                      break;
+                case CSR_PMPADDR41:     rdata = 0;                                                      break;
+                case CSR_PMPADDR42:     rdata = 0;                                                      break;
+                case CSR_PMPADDR43:     rdata = 0;                                                      break;
+                case CSR_PMPADDR44:     rdata = 0;                                                      break;
+                case CSR_PMPADDR45:     rdata = 0;                                                      break;
+                case CSR_PMPADDR46:     rdata = 0;                                                      break;
+                case CSR_PMPADDR47:     rdata = 0;                                                      break;
+                case CSR_PMPADDR48:     rdata = 0;                                                      break;
+                case CSR_PMPADDR49:     rdata = 0;                                                      break;
+                case CSR_PMPADDR50:     rdata = 0;                                                      break;
+                case CSR_PMPADDR51:     rdata = 0;                                                      break;
+                case CSR_PMPADDR52:     rdata = 0;                                                      break;
+                case CSR_PMPADDR53:     rdata = 0;                                                      break;
+                case CSR_PMPADDR54:     rdata = 0;                                                      break;
+                case CSR_PMPADDR55:     rdata = 0;                                                      break;
+                case CSR_PMPADDR56:     rdata = 0;                                                      break;
+                case CSR_PMPADDR57:     rdata = 0;                                                      break;
+                case CSR_PMPADDR58:     rdata = 0;                                                      break;
+                case CSR_PMPADDR59:     rdata = 0;                                                      break;
+                case CSR_PMPADDR60:     rdata = 0;                                                      break;
+                case CSR_PMPADDR61:     rdata = 0;                                                      break;
+                case CSR_PMPADDR62:     rdata = 0;                                                      break;
+                case CSR_PMPADDR63:     rdata = 0;                                                      break;
+                case CSR_SBPREDCTRL:    rdata = (uint63)0 :: r_sbpredctrl.flush_bpred;
+                                        break;
+                case CSR_TSELECT:       rdata = (uint62)0 :: r_tselect.idx;
+                                        break;
+                case CSR_TDATA1:        rdata = r_tdata1[r_tselect.idx];                                break;
+                case CSR_TDATA2:        rdata = r_tdata2[r_tselect.idx];                                break;
+                case CSR_TINFO:         rdata = r_tinfo;                                                break;
+                case CSR_DCSR:          rdata = r_dcsr.debugver :: (uint10)0 :: r_dcsr.ebreakvs :: r_dcsr.ebreakvu :: r_dcsr.ebreakm :: (uint1)0 :: r_dcsr.ebreaks :: r_dcsr.ebreaku :: r_dcsr.stepie :: r_dcsr.stopcount :: r_dcsr.stoptime :: r_dcsr.cause :: r_dcsr.v :: r_dcsr.mprven :: r_dcsr.nmip :: r_dcsr.step :: r_dcsr.prv;
+                                        break;
+                case CSR_DPC:           rdata = r_dpc.dpc :: (uint1)0;
+                                        break;
+                case CSR_DSCRATCH0:     rdata = r_dscratch0;                                            break;
+                case CSR_DSCRATCH1:     rdata = r_dscratch1;                                            break;
+                case CSR_MCFGCTRL:      rdata = (uint47)0 :: r_mcfgctrl.dis_large_tlb_page :: (uint8)0 :: r_mcfgctrl.dis_br_pred :: r_mcfgctrl.dis_spec_state_issue :: r_mcfgctrl.dis_slot1 :: r_mcfgctrl.dis_alu_logic_dual_issue :: r_mcfgctrl.dis_mv_dual_issue :: r_mcfgctrl.dis_alu_agu_dual_issue :: r_mcfgctrl.dis_all_dual_issue :: r_mcfgctrl.dis_late_alu;
+                                        break;
+                case CSR_MCACHESTATUS:  read_only = 1;
+                                        rdata = (uint39)0 :: r_mcachestatus.wfi_stop_mode :: (uint7)0 :: r_mcachestatus.l2cache_disabled :: (uint6)0 :: r_mcachestatus.dcache_pref_disabled :: r_mcachestatus.dcache_disabled :: (uint6)0 :: r_mcachestatus.icache_pref_disabled :: r_mcachestatus.icache_disabled;
+                                        break;
+                case CSR_MDCACHECTRL:   rdata = (uint60)0 :: r_mdcachectrl.manage_dcache;
+                                        break;
+                case CSR_MICACHECTRL:   rdata = (uint61)0 :: r_micachectrl.manage_icache;
+                                        break;
+                case CSR_ML2CACHECTRL:  rdata = (uint60)0 :: r_ml2cachectrl.manage_l2cache;
+                                        break;
+                case CSR_MCYCLE:        rdata = r_mcycle;                                               break;
+                case CSR_MINSTRET:      rdata = r_minstret;                                             break;
+                case CSR_MHPMCOUNTER3:  rdata = r_mhpmcounter3;                                         break;
+                case CSR_MHPMCOUNTER4:  rdata = r_mhpmcounter4;                                         break;
+                case CSR_MHPMCOUNTER5:  rdata = r_mhpmcounter5;                                         break;
+                case CSR_MHPMCOUNTER6:  rdata = r_mhpmcounter6;                                         break;
+                case CSR_MHPMCOUNTER7:  read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER8:  read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER9:  read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER10: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER11: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER12: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER13: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER14: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER15: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER16: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER17: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER18: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER19: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER20: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER21: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER22: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER23: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER24: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER25: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER26: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER27: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER28: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER29: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER30: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_MHPMCOUNTER31: read_only = 1;
+                                        rdata = 0;                                                      break;
+                case CSR_VL:            read_only = 1;
+                                        if(vl_en) {
+                                            rdata = r_vl;
+                                        }
+                                        else {
+                                            read_err = 1;
+                                        }                                                               break;
+                case CSR_VTYPE:         read_only = 1;
+                                        if(vtype_en) {
+                                            rdata = r_vtype.vill :: (uint55)0 :: r_vtype.vma :: r_vtype.vta :: r_vtype.vsew :: r_vtype.vlmul;
+                                        }
+                                        else {
+                                            read_err = 1; //Access is disabled. Register is reserved.
+                                        }
+                                        break;
+                case CSR_VLENB:         read_only = 1;
+                                        if(vlenb_en) {
+                                            rdata = r_vlenb;
+                                        }
+                                        else {
+                                            read_err = 1;
+                                        }                                                               break;
+                case CSR_MVENDORID:     read_only = 1;
+                                        rdata = (uint32)0 :: r_mvendorid;                               break;
+                case CSR_MARCHID:       read_only = 1;
+                                        rdata = r_marchid.preset :: (uint35)0 :: r_marchid.vector :: (uint4)0 :: r_marchid.cheri :: r_marchid.fusa :: r_marchid.archt :: (uint4)0 :: r_marchid.obilix;
+                                        break;
+                case CSR_MIMPID:        read_only = 1;
+                                        rdata = r_mimpid;                                               break;
+                case CSR_MHARTID:       read_only = 1;
+                                        rdata = r_mhartid;                                              break;
+                case CSR_MCONFIGPTR:    read_only = 1;
+                                        rdata = r_mconfigptr;                                           break;
+
+                default: 
+                    read_err = 1;
+                    read_only = 0;
+                    break;
+            }
+        }
+    }
+
+    public always void wr_access(
+        //sw input
+        uint1               write,
+        uint12              waddr,
+        uint64              wdata,
+        //hw input
+        uint1               fcsr_fflags_we,
+        uint5               fcsr_fflags_val,
+        uint1               fcsr_frm_we,
+        uint3               fcsr_frm_val,
+        uint1               vcsr_vxsat_we,
+        uint1               vcsr_vxsat_val,
+        uint1               vcsr_vxrm_we,
+        uint2               vcsr_vxrm_val,
+        uint1               sepc_epc_we,
+        uint63              sepc_epc_val,
+        uint1               scause_expt_we,
+        uint63              scause_expt_val,
+        uint1               scause_intr_we,
+        uint1               scause_intr_val,
+        uint1               stval_we,
+        uint_<{SXLEN}>      stval_val,
+        uint1               mstatus_sie_we,
+        uint1               mstatus_sie_val,
+        uint1               mstatus_mie_we,
+        uint1               mstatus_mie_val,
+        uint1               mstatus_spie_we,
+        uint1               mstatus_spie_val,
+        uint1               mstatus_ube_we,
+        uint1               mstatus_ube_val,
+        uint1               mstatus_mpie_we,
+        uint1               mstatus_mpie_val,
+        uint1               mstatus_spp_we,
+        uint1               mstatus_spp_val,
+        uint1               mstatus_vs_we,
+        uint2               mstatus_vs_val,
+        uint1               mstatus_mpp_we,
+        uint2               mstatus_mpp_val,
+        uint1               mstatus_fs_we,
+        uint2               mstatus_fs_val,
+        uint1               mstatus_xs_we,
+        uint2               mstatus_xs_val,
+        uint1               mstatus_mprv_we,
+        uint1               mstatus_mprv_val,
+        uint1               mstatus_sum_we,
+        uint1               mstatus_sum_val,
+        uint1               mstatus_mxr_we,
+        uint1               mstatus_mxr_val,
+        uint1               mstatus_tvm_we,
+        uint1               mstatus_tvm_val,
+        uint1               mstatus_tw_we,
+        uint1               mstatus_tw_val,
+        uint1               mstatus_tsr_we,
+        uint1               mstatus_tsr_val,
+        uint1               mstatus_uxl_we,
+        uint2               mstatus_uxl_val,
+        uint1               mstatus_sxl_we,
+        uint2               mstatus_sxl_val,
+        uint1               mstatus_sbe_we,
+        uint1               mstatus_sbe_val,
+        uint1               mstatus_mbe_we,
+        uint1               mstatus_mbe_val,
+        uint1               mstatus_sd_we,
+        uint1               mstatus_sd_val,
+        uint1               mepc_epc_we,
+        uint63              mepc_epc_val,
+        uint1               mcause_expt_we,
+        uint63              mcause_expt_val,
+        uint1               mcause_intr_we,
+        uint1               mcause_intr_val,
+        uint1               mtval_we,
+        uint_<{MXLEN}>      mtval_val,
+        uint1               mip_ssip_we,
+        uint1               mip_ssip_val,
+        uint1               mip_msip_we,
+        uint1               mip_msip_val,
+        uint1               mip_stip_we,
+        uint1               mip_stip_val,
+        uint1               mip_mtip_we,
+        uint1               mip_mtip_val,
+        uint1               mip_seip_we,
+        uint1               mip_seip_val,
+        uint1               mip_meip_we,
+        uint1               mip_meip_val,
+        uint1               tdata1_we,
+        uint64              tdata1_val,
+        uint2               tdata1_idx,
+        uint1               dcsr_prv_we,
+        uint2               dcsr_prv_val,
+        uint1               dcsr_step_we,
+        uint1               dcsr_step_val,
+        uint1               dcsr_nmip_we,
+        uint1               dcsr_nmip_val,
+        uint1               dcsr_mprven_we,
+        uint1               dcsr_mprven_val,
+        uint1               dcsr_v_we,
+        uint1               dcsr_v_val,
+        uint1               dcsr_cause_we,
+        uint3               dcsr_cause_val,
+        uint1               dcsr_stoptime_we,
+        uint1               dcsr_stoptime_val,
+        uint1               dcsr_stopcount_we,
+        uint1               dcsr_stopcount_val,
+        uint1               dcsr_stepie_we,
+        uint1               dcsr_stepie_val,
+        uint1               dcsr_ebreaku_we,
+        uint1               dcsr_ebreaku_val,
+        uint1               dcsr_ebreaks_we,
+        uint1               dcsr_ebreaks_val,
+        uint1               dcsr_ebreakm_we,
+        uint1               dcsr_ebreakm_val,
+        uint1               dcsr_ebreakvu_we,
+        uint1               dcsr_ebreakvu_val,
+        uint1               dcsr_ebreakvs_we,
+        uint1               dcsr_ebreakvs_val,
+        uint1               dcsr_debugver_we,
+        uint4               dcsr_debugver_val,
+        uint1               dpc_dpc_we,
+        uint63              dpc_dpc_val,
+        uint1               mcachestatus_icache_disabled_we,
+        uint1               mcachestatus_icache_disabled_val,
+        uint1               mcachestatus_icache_pref_disabled_we,
+        uint1               mcachestatus_icache_pref_disabled_val,
+        uint1               mcachestatus_dcache_disabled_we,
+        uint1               mcachestatus_dcache_disabled_val,
+        uint1               mcachestatus_dcache_pref_disabled_we,
+        uint1               mcachestatus_dcache_pref_disabled_val,
+        uint1               mcachestatus_l2cache_disabled_we,
+        uint1               mcachestatus_l2cache_disabled_val,
+        uint1               mcachestatus_wfi_stop_mode_we,
+        uint1               mcachestatus_wfi_stop_mode_val,
+        uint1               mcycle_we,
+        uint_<{MXLEN}>      mcycle_val,
+        uint1               minstret_we,
+        uint_<{MXLEN}>      minstret_val,
+        uint1               mhpmcounter3_we,
+        uint_<{MXLEN}>      mhpmcounter3_val,
+        uint1               mhpmcounter4_we,
+        uint_<{MXLEN}>      mhpmcounter4_val,
+        uint1               mhpmcounter5_we,
+        uint_<{MXLEN}>      mhpmcounter5_val,
+        uint1               mhpmcounter6_we,
+        uint_<{MXLEN}>      mhpmcounter6_val,
+        uint1               mhartid_we,
+        uint_<{MXLEN}>      mhartid_val,
+        uint1               mconfigptr_we,
+        uint_<{MXLEN}>      mconfigptr_val
+        )
+  {
+
+        //local wires
+        uint1               sw_fcsr_fflags_we;
+        uint1               sw_fcsr_frm_we;
+        uint1               sw_vcsr_vxsat_we;
+        uint1               sw_vcsr_vxrm_we;
+        uint1               sw_sepc_epc_we;
+        uint1               sw_scause_expt_we;
+        uint1               sw_scause_intr_we;
+        uint1               sw_stval_we;
+        uint1               sw_mstatus_sie_we;
+        uint1               sw_mstatus_mie_we;
+        uint1               sw_mstatus_spie_we;
+        uint1               sw_mstatus_ube_we;
+        uint1               sw_mstatus_mpie_we;
+        uint1               sw_mstatus_spp_we;
+        uint1               sw_mstatus_vs_we;
+        uint1               sw_mstatus_mpp_we;
+        uint1               sw_mstatus_fs_we;
+        uint1               sw_mstatus_xs_we;
+        uint1               sw_mstatus_mprv_we;
+        uint1               sw_mstatus_sum_we;
+        uint1               sw_mstatus_mxr_we;
+        uint1               sw_mstatus_tvm_we;
+        uint1               sw_mstatus_tw_we;
+        uint1               sw_mstatus_tsr_we;
+        uint1               sw_mstatus_uxl_we;
+        uint1               sw_mstatus_sxl_we;
+        uint1               sw_mstatus_sbe_we;
+        uint1               sw_mstatus_mbe_we;
+        uint1               sw_mstatus_sd_we;
+        uint1               sw_mepc_epc_we;
+        uint1               sw_mcause_expt_we;
+        uint1               sw_mcause_intr_we;
+        uint1               sw_mtval_we;
+        uint1               sw_mip_ssip_we;
+        uint1               sw_mip_msip_we;
+        uint1               sw_mip_stip_we;
+        uint1               sw_mip_mtip_we;
+        uint1               sw_mip_seip_we;
+        uint1               sw_mip_meip_we;
+        uint1               sw_tdata1_we;
+        uint1               sw_dcsr_prv_we;
+        uint1               sw_dcsr_step_we;
+        uint1               sw_dcsr_nmip_we;
+        uint1               sw_dcsr_mprven_we;
+        uint1               sw_dcsr_v_we;
+        uint1               sw_dcsr_cause_we;
+        uint1               sw_dcsr_stoptime_we;
+        uint1               sw_dcsr_stopcount_we;
+        uint1               sw_dcsr_stepie_we;
+        uint1               sw_dcsr_ebreaku_we;
+        uint1               sw_dcsr_ebreaks_we;
+        uint1               sw_dcsr_ebreakm_we;
+        uint1               sw_dcsr_ebreakvu_we;
+        uint1               sw_dcsr_ebreakvs_we;
+        uint1               sw_dcsr_debugver_we;
+        uint1               sw_dpc_dpc_we;
+        uint1               sw_mcachestatus_icache_disabled_we;
+        uint1               sw_mcachestatus_icache_pref_disabled_we;
+        uint1               sw_mcachestatus_dcache_disabled_we;
+        uint1               sw_mcachestatus_dcache_pref_disabled_we;
+        uint1               sw_mcachestatus_l2cache_disabled_we;
+        uint1               sw_mcachestatus_wfi_stop_mode_we;
+        uint1               sw_mcycle_we;
+        uint1               sw_minstret_we;
+        uint1               sw_mhpmcounter3_we;
+        uint1               sw_mhpmcounter4_we;
+        uint1               sw_mhpmcounter5_we;
+        uint1               sw_mhpmcounter6_we;
+        uint1               sw_mhartid_we;
+        uint1               sw_mconfigptr_we;
+
+
+        //Set initial value
+        sw_fcsr_fflags_we       = 0;
+        sw_fcsr_frm_we          = 0;
+        sw_vcsr_vxsat_we        = 0;
+        sw_vcsr_vxrm_we         = 0;
+        sw_sepc_epc_we          = 0;
+        sw_scause_expt_we       = 0;
+        sw_scause_intr_we       = 0;
+        sw_stval_we             = 0;
+        sw_mstatus_sie_we       = 0;
+        sw_mstatus_mie_we       = 0;
+        sw_mstatus_spie_we      = 0;
+        sw_mstatus_ube_we       = 0;
+        sw_mstatus_mpie_we      = 0;
+        sw_mstatus_spp_we       = 0;
+        sw_mstatus_vs_we        = 0;
+        sw_mstatus_mpp_we       = 0;
+        sw_mstatus_fs_we        = 0;
+        sw_mstatus_xs_we        = 0;
+        sw_mstatus_mprv_we      = 0;
+        sw_mstatus_sum_we       = 0;
+        sw_mstatus_mxr_we       = 0;
+        sw_mstatus_tvm_we       = 0;
+        sw_mstatus_tw_we        = 0;
+        sw_mstatus_tsr_we       = 0;
+        sw_mstatus_uxl_we       = 0;
+        sw_mstatus_sxl_we       = 0;
+        sw_mstatus_sbe_we       = 0;
+        sw_mstatus_mbe_we       = 0;
+        sw_mstatus_sd_we        = 0;
+        sw_mepc_epc_we          = 0;
+        sw_mcause_expt_we       = 0;
+        sw_mcause_intr_we       = 0;
+        sw_mtval_we             = 0;
+        sw_mip_ssip_we          = 0;
+        sw_mip_msip_we          = 0;
+        sw_mip_stip_we          = 0;
+        sw_mip_mtip_we          = 0;
+        sw_mip_seip_we          = 0;
+        sw_mip_meip_we          = 0;
+        sw_tdata1_we            = 0;
+        sw_dcsr_prv_we          = 0;
+        sw_dcsr_step_we         = 0;
+        sw_dcsr_nmip_we         = 0;
+        sw_dcsr_mprven_we       = 0;
+        sw_dcsr_v_we            = 0;
+        sw_dcsr_cause_we        = 0;
+        sw_dcsr_stoptime_we     = 0;
+        sw_dcsr_stopcount_we    = 0;
+        sw_dcsr_stepie_we       = 0;
+        sw_dcsr_ebreaku_we      = 0;
+        sw_dcsr_ebreaks_we      = 0;
+        sw_dcsr_ebreakm_we      = 0;
+        sw_dcsr_ebreakvu_we     = 0;
+        sw_dcsr_ebreakvs_we     = 0;
+        sw_dcsr_debugver_we     = 0;
+        sw_dpc_dpc_we           = 0;
+        sw_mcachestatus_icache_disabled_we= 0;
+        sw_mcachestatus_icache_pref_disabled_we= 0;
+        sw_mcachestatus_dcache_disabled_we= 0;
+        sw_mcachestatus_dcache_pref_disabled_we= 0;
+        sw_mcachestatus_l2cache_disabled_we= 0;
+        sw_mcachestatus_wfi_stop_mode_we= 0;
+        sw_mcycle_we            = 0;
+        sw_minstret_we          = 0;
+        sw_mhpmcounter3_we      = 0;
+        sw_mhpmcounter4_we      = 0;
+        sw_mhpmcounter5_we      = 0;
+        sw_mhpmcounter6_we      = 0;
+        sw_mhartid_we           = 0;
+        sw_mconfigptr_we        = 0;
+
+        if (write)
+        {
+            switch (waddr)
+            {
+                case CSR_FCSR:                  sw_fcsr_fflags_we = 1;                                          
+                                                sw_fcsr_frm_we = 1;                                             
+                                                break;
+                case CSR_VSTART:                r_vstart = wdata;                                               break;
+                case CSR_VCSR:                  sw_vcsr_vxsat_we = 1;                                           
+                                                sw_vcsr_vxrm_we = 1;                                            
+                                                break;
+                case CSR_STVEC:                 r_stvec.mode = wdata[0..0];                                     
+                                                r_stvec.base = wdata[63..4];                                    
+                                                break;
+                case CSR_SCOUNTEREN:            r_scounteren.cy = wdata[0..0];                                  
+                                                r_scounteren.tm = wdata[1..1];                                  
+                                                r_scounteren.ir = wdata[2..2];                                  
+                                                r_scounteren.hpm6_3 = wdata[6..3];                              
+                                                break;
+                case CSR_SENVCFG:               r_senvcfg = wdata;                                              break;
+                case CSR_SSCRATCH:              r_sscratch = wdata;                                             break;
+                case CSR_SEPC:                  sw_sepc_epc_we = 1;                                             
+                                                break;
+                case CSR_SCAUSE:                sw_scause_expt_we = 1;                                          
+                                                sw_scause_intr_we = 1;                                          
+                                                break;
+                case CSR_STVAL:                 sw_stval_we = 1;                                                break;
+                case CSR_SATP:                  r_satp.ppn = wdata[43..0];                                      
+                                                r_satp.asid = wdata[59..44];                                    
+                                                r_satp.mode = wdata[63..60];                                    
+                                                break;
+                case CSR_MSTATUS:               sw_mstatus_sie_we = 1;                                          
+                                                sw_mstatus_mie_we = 1;                                          
+                                                sw_mstatus_spie_we = 1;                                         
+                                                sw_mstatus_ube_we = 1;                                          
+                                                sw_mstatus_mpie_we = 1;                                         
+                                                sw_mstatus_spp_we = 1;                                          
+                                                sw_mstatus_vs_we = 1;                                           
+                                                sw_mstatus_mpp_we = 1;                                          
+                                                sw_mstatus_fs_we = 1;                                           
+                                                sw_mstatus_xs_we = 1;                                           
+                                                sw_mstatus_mprv_we = 1;                                         
+                                                sw_mstatus_sum_we = 1;                                          
+                                                sw_mstatus_mxr_we = 1;                                          
+                                                sw_mstatus_tvm_we = 1;                                          
+                                                sw_mstatus_tw_we = 1;                                           
+                                                sw_mstatus_tsr_we = 1;                                          
+                                                sw_mstatus_uxl_we = 1;                                          
+                                                sw_mstatus_sxl_we = 1;                                          
+                                                sw_mstatus_sbe_we = 1;                                          
+                                                sw_mstatus_mbe_we = 1;                                          
+                                                sw_mstatus_sd_we = 1;                                           
+                                                break;
+                case CSR_MISA:                  break;
+                case CSR_MEDELEG:               r_medeleg.expt = wdata[15..0];                                  
+                                                break;
+                case CSR_MIDELEG:               r_mideleg.ssid = wdata[1..1];                                   
+                                                r_mideleg.msid = wdata[3..3];                                   
+                                                r_mideleg.stid = wdata[5..5];                                   
+                                                r_mideleg.mtid = wdata[7..7];                                   
+                                                r_mideleg.seid = wdata[9..9];                                   
+                                                r_mideleg.meid = wdata[11..11];                                 
+                                                break;
+                case CSR_MIE:                   r_mie.ssie = wdata[1..1];                                       
+                                                r_mie.msie = wdata[3..3];                                       
+                                                r_mie.stie = wdata[5..5];                                       
+                                                r_mie.mtie = wdata[7..7];                                       
+                                                r_mie.seie = wdata[9..9];                                       
+                                                r_mie.meie = wdata[11..11];                                     
+                                                break;
+                case CSR_MTVEC:                 r_mtvec.mode = wdata[0..0];                                     
+                                                r_mtvec.base = wdata[63..4];                                    
+                                                break;
+                case CSR_MCOUNTEREN:            r_mcounteren.cy = wdata[0..0];                                  
+                                                r_mcounteren.tm = wdata[1..1];                                  
+                                                r_mcounteren.ir = wdata[2..2];                                  
+                                                r_mcounteren.hpm6_3 = wdata[6..3];                              
+                                                break;
+                case CSR_MENVCFG:               r_menvcfg = wdata;                                              break;
+                case CSR_MCOUNTINHIBIT:         r_mcountinhibit.cy = wdata[0..0];                               
+                                                r_mcountinhibit.ir = wdata[2..2];                               
+                                                r_mcountinhibit.hpm6_3 = wdata[6..3];                           
+                                                break;
+                case CSR_MHPMEVENT3:            r_mhpmevent3.evt = wdata[11..0];                                
+                                                break;
+                case CSR_MHPMEVENT4:            r_mhpmevent4.evt = wdata[11..0];                                
+                                                break;
+                case CSR_MHPMEVENT5:            r_mhpmevent5.evt = wdata[11..0];                                
+                                                break;
+                case CSR_MHPMEVENT6:            r_mhpmevent6.evt = wdata[11..0];                                
+                                                break;
+                case CSR_MHPMEVENT7:                                                                            break;
+                case CSR_MHPMEVENT8:                                                                            break;
+                case CSR_MHPMEVENT9:                                                                            break;
+                case CSR_MHPMEVENT10:                                                                           break;
+                case CSR_MHPMEVENT11:                                                                           break;
+                case CSR_MHPMEVENT12:                                                                           break;
+                case CSR_MHPMEVENT13:                                                                           break;
+                case CSR_MHPMEVENT14:                                                                           break;
+                case CSR_MHPMEVENT15:                                                                           break;
+                case CSR_MHPMEVENT16:                                                                           break;
+                case CSR_MHPMEVENT17:                                                                           break;
+                case CSR_MHPMEVENT18:                                                                           break;
+                case CSR_MHPMEVENT19:                                                                           break;
+                case CSR_MHPMEVENT20:                                                                           break;
+                case CSR_MHPMEVENT21:                                                                           break;
+                case CSR_MHPMEVENT22:                                                                           break;
+                case CSR_MHPMEVENT23:                                                                           break;
+                case CSR_MHPMEVENT24:                                                                           break;
+                case CSR_MHPMEVENT25:                                                                           break;
+                case CSR_MHPMEVENT26:                                                                           break;
+                case CSR_MHPMEVENT27:                                                                           break;
+                case CSR_MHPMEVENT28:                                                                           break;
+                case CSR_MHPMEVENT29:                                                                           break;
+                case CSR_MHPMEVENT30:                                                                           break;
+                case CSR_MHPMEVENT31:                                                                           break;
+                case CSR_MSCRATCH:              r_mscratch = wdata;                                             break;
+                case CSR_MEPC:                  sw_mepc_epc_we = 1;                                             
+                                                break;
+                case CSR_MCAUSE:                sw_mcause_expt_we = 1;                                          
+                                                sw_mcause_intr_we = 1;                                          
+                                                break;
+                case CSR_MTVAL:                 sw_mtval_we = 1;                                                break;
+                case CSR_MIP:                   sw_mip_ssip_we = 1;                                             
+                                                sw_mip_msip_we = 1;                                             
+                                                sw_mip_stip_we = 1;                                             
+                                                sw_mip_mtip_we = 1;                                             
+                                                sw_mip_seip_we = 1;                                             
+                                                sw_mip_meip_we = 1;                                             
+                                                break;
+                case CSR_PMPCFG0:               r_pmpcfg0 = wdata;                                              break;
+                case CSR_PMPCFG2:               r_pmpcfg2 = wdata;                                              break;
+                case CSR_PMPCFG4:               r_pmpcfg4 = wdata;                                              break;
+                case CSR_PMPCFG6:               r_pmpcfg6 = wdata;                                              break;
+                case CSR_PMPCFG8:                                                                               break;
+                case CSR_PMPCFG10:                                                                              break;
+                case CSR_PMPCFG12:                                                                              break;
+                case CSR_PMPCFG14:                                                                              break;
+                case CSR_PMPADDR0:              r_pmpaddr0 = wdata;                                             break;
+                case CSR_PMPADDR1:              r_pmpaddr1 = wdata;                                             break;
+                case CSR_PMPADDR2:              r_pmpaddr2 = wdata;                                             break;
+                case CSR_PMPADDR3:              r_pmpaddr3 = wdata;                                             break;
+                case CSR_PMPADDR4:              r_pmpaddr4 = wdata;                                             break;
+                case CSR_PMPADDR5:              r_pmpaddr5 = wdata;                                             break;
+                case CSR_PMPADDR6:              r_pmpaddr6 = wdata;                                             break;
+                case CSR_PMPADDR7:              r_pmpaddr7 = wdata;                                             break;
+                case CSR_PMPADDR8:              r_pmpaddr8 = wdata;                                             break;
+                case CSR_PMPADDR9:              r_pmpaddr9 = wdata;                                             break;
+                case CSR_PMPADDR10:             r_pmpaddr10 = wdata;                                            break;
+                case CSR_PMPADDR11:             r_pmpaddr11 = wdata;                                            break;
+                case CSR_PMPADDR12:             r_pmpaddr12 = wdata;                                            break;
+                case CSR_PMPADDR13:             r_pmpaddr13 = wdata;                                            break;
+                case CSR_PMPADDR14:             r_pmpaddr14 = wdata;                                            break;
+                case CSR_PMPADDR15:             r_pmpaddr15 = wdata;                                            break;
+                case CSR_PMPADDR16:                                                                             break;
+                case CSR_PMPADDR17:                                                                             break;
+                case CSR_PMPADDR18:                                                                             break;
+                case CSR_PMPADDR19:                                                                             break;
+                case CSR_PMPADDR20:                                                                             break;
+                case CSR_PMPADDR21:                                                                             break;
+                case CSR_PMPADDR22:                                                                             break;
+                case CSR_PMPADDR23:                                                                             break;
+                case CSR_PMPADDR24:                                                                             break;
+                case CSR_PMPADDR25:                                                                             break;
+                case CSR_PMPADDR26:                                                                             break;
+                case CSR_PMPADDR27:                                                                             break;
+                case CSR_PMPADDR28:                                                                             break;
+                case CSR_PMPADDR29:                                                                             break;
+                case CSR_PMPADDR30:                                                                             break;
+                case CSR_PMPADDR31:                                                                             break;
+                case CSR_PMPADDR32:                                                                             break;
+                case CSR_PMPADDR33:                                                                             break;
+                case CSR_PMPADDR34:                                                                             break;
+                case CSR_PMPADDR35:                                                                             break;
+                case CSR_PMPADDR36:                                                                             break;
+                case CSR_PMPADDR37:                                                                             break;
+                case CSR_PMPADDR38:                                                                             break;
+                case CSR_PMPADDR39:                                                                             break;
+                case CSR_PMPADDR40:                                                                             break;
+                case CSR_PMPADDR41:                                                                             break;
+                case CSR_PMPADDR42:                                                                             break;
+                case CSR_PMPADDR43:                                                                             break;
+                case CSR_PMPADDR44:                                                                             break;
+                case CSR_PMPADDR45:                                                                             break;
+                case CSR_PMPADDR46:                                                                             break;
+                case CSR_PMPADDR47:                                                                             break;
+                case CSR_PMPADDR48:                                                                             break;
+                case CSR_PMPADDR49:                                                                             break;
+                case CSR_PMPADDR50:                                                                             break;
+                case CSR_PMPADDR51:                                                                             break;
+                case CSR_PMPADDR52:                                                                             break;
+                case CSR_PMPADDR53:                                                                             break;
+                case CSR_PMPADDR54:                                                                             break;
+                case CSR_PMPADDR55:                                                                             break;
+                case CSR_PMPADDR56:                                                                             break;
+                case CSR_PMPADDR57:                                                                             break;
+                case CSR_PMPADDR58:                                                                             break;
+                case CSR_PMPADDR59:                                                                             break;
+                case CSR_PMPADDR60:                                                                             break;
+                case CSR_PMPADDR61:                                                                             break;
+                case CSR_PMPADDR62:                                                                             break;
+                case CSR_PMPADDR63:                                                                             break;
+                case CSR_SBPREDCTRL:            r_sbpredctrl.flush_bpred = wdata[0..0];                         
+                                                break;
+                case CSR_TSELECT:               r_tselect.idx = wdata[1..0];                                    
+                                                break;
+                case CSR_TDATA1:                sw_tdata1_we = 1;                                               break;
+                case CSR_TDATA2:                r_tdata2[r_tselect.idx] = wdata;                                break;
+                case CSR_TINFO:                 r_tinfo = wdata;                                                break;
+                case CSR_DCSR:                  sw_dcsr_prv_we = 1;                                             
+                                                sw_dcsr_step_we = 1;                                            
+                                                sw_dcsr_nmip_we = 1;                                            
+                                                sw_dcsr_mprven_we = 1;                                          
+                                                sw_dcsr_v_we = 1;                                               
+                                                sw_dcsr_cause_we = 1;                                           
+                                                sw_dcsr_stoptime_we = 1;                                        
+                                                sw_dcsr_stopcount_we = 1;                                       
+                                                sw_dcsr_stepie_we = 1;                                          
+                                                sw_dcsr_ebreaku_we = 1;                                         
+                                                sw_dcsr_ebreaks_we = 1;                                         
+                                                sw_dcsr_ebreakm_we = 1;                                         
+                                                sw_dcsr_ebreakvu_we = 1;                                        
+                                                sw_dcsr_ebreakvs_we = 1;                                        
+                                                sw_dcsr_debugver_we = 1;                                        
+                                                break;
+                case CSR_DPC:                   sw_dpc_dpc_we = 1;                                              
+                                                break;
+                case CSR_DSCRATCH0:             r_dscratch0 = wdata;                                            break;
+                case CSR_DSCRATCH1:             r_dscratch1 = wdata;                                            break;
+                case CSR_MCFGCTRL:              r_mcfgctrl.dis_late_alu = wdata[0..0];                          
+                                                r_mcfgctrl.dis_all_dual_issue = wdata[1..1];                    
+                                                r_mcfgctrl.dis_alu_agu_dual_issue = wdata[2..2];                
+                                                r_mcfgctrl.dis_mv_dual_issue = wdata[3..3];                     
+                                                r_mcfgctrl.dis_alu_logic_dual_issue = wdata[4..4];              
+                                                r_mcfgctrl.dis_slot1 = wdata[5..5];                             
+                                                r_mcfgctrl.dis_spec_state_issue = wdata[6..6];                  
+                                                r_mcfgctrl.dis_br_pred = wdata[7..7];                           
+                                                r_mcfgctrl.dis_large_tlb_page = wdata[16..16];                  
+                                                break;
+                case CSR_MCACHESTATUS:          sw_mcachestatus_icache_disabled_we = 0;                         
+                                                sw_mcachestatus_icache_pref_disabled_we = 0;                    
+                                                sw_mcachestatus_dcache_disabled_we = 0;                         
+                                                sw_mcachestatus_dcache_pref_disabled_we = 0;                    
+                                                sw_mcachestatus_l2cache_disabled_we = 0;                        
+                                                sw_mcachestatus_wfi_stop_mode_we = 0;                           
+                                                break;
+                case CSR_MDCACHECTRL:           r_mdcachectrl.manage_dcache = wdata[3..0];                      
+                                                break;
+                case CSR_MICACHECTRL:           r_micachectrl.manage_icache = wdata[2..0];                      
+                                                break;
+                case CSR_ML2CACHECTRL:          r_ml2cachectrl.manage_l2cache = wdata[3..0];                    
+                                                break;
+                case CSR_MCYCLE:                sw_mcycle_we = 1;                                               break;
+                case CSR_MINSTRET:              sw_minstret_we = 1;                                             break;
+                case CSR_MHPMCOUNTER3:          sw_mhpmcounter3_we = 1;                                         break;
+                case CSR_MHPMCOUNTER4:          sw_mhpmcounter4_we = 1;                                         break;
+                case CSR_MHPMCOUNTER5:          sw_mhpmcounter5_we = 1;                                         break;
+                case CSR_MHPMCOUNTER6:          sw_mhpmcounter6_we = 1;                                         break;
+                case CSR_MHPMCOUNTER7:                                                                          break;
+                case CSR_MHPMCOUNTER8:                                                                          break;
+                case CSR_MHPMCOUNTER9:                                                                          break;
+                case CSR_MHPMCOUNTER10:                                                                         break;
+                case CSR_MHPMCOUNTER11:                                                                         break;
+                case CSR_MHPMCOUNTER12:                                                                         break;
+                case CSR_MHPMCOUNTER13:                                                                         break;
+                case CSR_MHPMCOUNTER14:                                                                         break;
+                case CSR_MHPMCOUNTER15:                                                                         break;
+                case CSR_MHPMCOUNTER16:                                                                         break;
+                case CSR_MHPMCOUNTER17:                                                                         break;
+                case CSR_MHPMCOUNTER18:                                                                         break;
+                case CSR_MHPMCOUNTER19:                                                                         break;
+                case CSR_MHPMCOUNTER20:                                                                         break;
+                case CSR_MHPMCOUNTER21:                                                                         break;
+                case CSR_MHPMCOUNTER22:                                                                         break;
+                case CSR_MHPMCOUNTER23:                                                                         break;
+                case CSR_MHPMCOUNTER24:                                                                         break;
+                case CSR_MHPMCOUNTER25:                                                                         break;
+                case CSR_MHPMCOUNTER26:                                                                         break;
+                case CSR_MHPMCOUNTER27:                                                                         break;
+                case CSR_MHPMCOUNTER28:                                                                         break;
+                case CSR_MHPMCOUNTER29:                                                                         break;
+                case CSR_MHPMCOUNTER30:                                                                         break;
+                case CSR_MHPMCOUNTER31:                                                                         break;
+                case CSR_VL:                                                                                    break;
+                case CSR_VTYPE:                 break;
+                case CSR_VLENB:                                                                                 break;
+                case CSR_MVENDORID:                                                                             break;
+                case CSR_MARCHID:               break;
+                case CSR_MIMPID:                                                                                break;
+                case CSR_MHARTID:               sw_mhartid_we = 0;                                              break;
+                case CSR_MCONFIGPTR:            sw_mconfigptr_we = 0;                                           break;
+
+                default: 
+                    //eprintf("Unknown CSR 0x%x for writing!", waddr);        
+                    break; 
+            }
+        }
+
+
+        //Register write selection
+        if (sw_fcsr_fflags_we   ) { r_fcsr.fflags       = wdata[4..0];          } else if (fcsr_fflags_we      ) { r_fcsr.fflags        = fcsr_fflags_val;     }
+        if (sw_fcsr_frm_we      ) { r_fcsr.frm          = wdata[7..5];          } else if (fcsr_frm_we         ) { r_fcsr.frm           = fcsr_frm_val;        }
+        if (sw_vcsr_vxsat_we    ) { r_vcsr.vxsat        = wdata[0..0];          } else if (vcsr_vxsat_we       ) { r_vcsr.vxsat         = vcsr_vxsat_val;      }
+        if (sw_vcsr_vxrm_we     ) { r_vcsr.vxrm         = wdata[2..1];          } else if (vcsr_vxrm_we        ) { r_vcsr.vxrm          = vcsr_vxrm_val;       }
+        if (sw_sepc_epc_we      ) { r_sepc.epc          = wdata[63..1];         } else if (sepc_epc_we         ) { r_sepc.epc           = sepc_epc_val;        }
+        if (sw_scause_expt_we   ) { r_scause.expt       = wdata[62..0];         } else if (scause_expt_we      ) { r_scause.expt        = scause_expt_val;     }
+        if (sw_scause_intr_we   ) { r_scause.intr       = wdata[63..63];        } else if (scause_intr_we      ) { r_scause.intr        = scause_intr_val;     }
+        if (sw_stval_we         ) { r_stval             = wdata[63..0];         } else if (stval_we            ) { r_stval              = stval_val;           }
+        if (sw_mstatus_sie_we   ) { r_mstatus.sie       = wdata[1..1];          } else if (mstatus_sie_we      ) { r_mstatus.sie        = mstatus_sie_val;     }
+        if (sw_mstatus_mie_we   ) { r_mstatus.mie       = wdata[3..3];          } else if (mstatus_mie_we      ) { r_mstatus.mie        = mstatus_mie_val;     }
+        if (sw_mstatus_spie_we  ) { r_mstatus.spie      = wdata[5..5];          } else if (mstatus_spie_we     ) { r_mstatus.spie       = mstatus_spie_val;    }
+        if (sw_mstatus_ube_we   ) { r_mstatus.ube       = wdata[6..6];          } else if (mstatus_ube_we      ) { r_mstatus.ube        = mstatus_ube_val;     }
+        if (sw_mstatus_mpie_we  ) { r_mstatus.mpie      = wdata[7..7];          } else if (mstatus_mpie_we     ) { r_mstatus.mpie       = mstatus_mpie_val;    }
+        if (sw_mstatus_spp_we   ) { r_mstatus.spp       = wdata[8..8];          } else if (mstatus_spp_we      ) { r_mstatus.spp        = mstatus_spp_val;     }
+        if (sw_mstatus_vs_we    ) { r_mstatus.vs        = wdata[10..9];         } else if (mstatus_vs_we       ) { r_mstatus.vs         = mstatus_vs_val;      }
+        if (sw_mstatus_mpp_we   ) { r_mstatus.mpp       = wdata[12..11];        } else if (mstatus_mpp_we      ) { r_mstatus.mpp        = mstatus_mpp_val;     }
+        if (sw_mstatus_fs_we    ) { r_mstatus.fs        = wdata[14..13];        } else if (mstatus_fs_we       ) { r_mstatus.fs         = mstatus_fs_val;      }
+        if (sw_mstatus_xs_we    ) { r_mstatus.xs        = wdata[16..15];        } else if (mstatus_xs_we       ) { r_mstatus.xs         = mstatus_xs_val;      }
+        if (sw_mstatus_mprv_we  ) { r_mstatus.mprv      = wdata[17..17];        } else if (mstatus_mprv_we     ) { r_mstatus.mprv       = mstatus_mprv_val;    }
+        if (sw_mstatus_sum_we   ) { r_mstatus.sum       = wdata[18..18];        } else if (mstatus_sum_we      ) { r_mstatus.sum        = mstatus_sum_val;     }
+        if (sw_mstatus_mxr_we   ) { r_mstatus.mxr       = wdata[19..19];        } else if (mstatus_mxr_we      ) { r_mstatus.mxr        = mstatus_mxr_val;     }
+        if (sw_mstatus_tvm_we   ) { r_mstatus.tvm       = wdata[20..20];        } else if (mstatus_tvm_we      ) { r_mstatus.tvm        = mstatus_tvm_val;     }
+        if (sw_mstatus_tw_we    ) { r_mstatus.tw        = wdata[21..21];        } else if (mstatus_tw_we       ) { r_mstatus.tw         = mstatus_tw_val;      }
+        if (sw_mstatus_tsr_we   ) { r_mstatus.tsr       = wdata[22..22];        } else if (mstatus_tsr_we      ) { r_mstatus.tsr        = mstatus_tsr_val;     }
+        if (sw_mstatus_uxl_we   ) { r_mstatus.uxl       = wdata[33..32];        } else if (mstatus_uxl_we      ) { r_mstatus.uxl        = mstatus_uxl_val;     }
+        if (sw_mstatus_sxl_we   ) { r_mstatus.sxl       = wdata[35..34];        } else if (mstatus_sxl_we      ) { r_mstatus.sxl        = mstatus_sxl_val;     }
+        if (sw_mstatus_sbe_we   ) { r_mstatus.sbe       = wdata[36..36];        } else if (mstatus_sbe_we      ) { r_mstatus.sbe        = mstatus_sbe_val;     }
+        if (sw_mstatus_mbe_we   ) { r_mstatus.mbe       = wdata[37..37];        } else if (mstatus_mbe_we      ) { r_mstatus.mbe        = mstatus_mbe_val;     }
+        if (sw_mstatus_sd_we    ) { r_mstatus.sd        = wdata[63..63];        } else if (mstatus_sd_we       ) { r_mstatus.sd         = mstatus_sd_val;      }
+        if (sw_mepc_epc_we      ) { r_mepc.epc          = wdata[63..1];         } else if (mepc_epc_we         ) { r_mepc.epc           = mepc_epc_val;        }
+        if (sw_mcause_expt_we   ) { r_mcause.expt       = wdata[62..0];         } else if (mcause_expt_we      ) { r_mcause.expt        = mcause_expt_val;     }
+        if (sw_mcause_intr_we   ) { r_mcause.intr       = wdata[63..63];        } else if (mcause_intr_we      ) { r_mcause.intr        = mcause_intr_val;     }
+        if (sw_mtval_we         ) { r_mtval             = wdata[63..0];         } else if (mtval_we            ) { r_mtval              = mtval_val;           }
+        if (sw_mip_ssip_we      ) { r_mip.ssip          = wdata[1..1];          } else if (mip_ssip_we         ) { r_mip.ssip           = mip_ssip_val;        }
+        if (sw_mip_msip_we      ) { r_mip.msip          = wdata[3..3];          } else if (mip_msip_we         ) { r_mip.msip           = mip_msip_val;        }
+        if (sw_mip_stip_we      ) { r_mip.stip          = wdata[5..5];          } else if (mip_stip_we         ) { r_mip.stip           = mip_stip_val;        }
+        if (sw_mip_mtip_we      ) { r_mip.mtip          = wdata[7..7];          } else if (mip_mtip_we         ) { r_mip.mtip           = mip_mtip_val;        }
+        if (sw_mip_seip_we      ) { r_mip.seip          = wdata[9..9];          } else if (mip_seip_we         ) { r_mip.seip           = mip_seip_val;        }
+        if (sw_mip_meip_we      ) { r_mip.meip          = wdata[11..11];        } else if (mip_meip_we         ) { r_mip.meip           = mip_meip_val;        }
+        if (sw_tdata1_we        ) { r_tdata1[r_tselect.idx]= wdata[63..0];         } else if (tdata1_we           ) { r_tdata1[tdata1_idx] = tdata1_val;          }
+        if (sw_dcsr_prv_we      ) { r_dcsr.prv          = wdata[1..0];          } else if (dcsr_prv_we         ) { r_dcsr.prv           = dcsr_prv_val;        }
+        if (sw_dcsr_step_we     ) { r_dcsr.step         = wdata[2..2];          } else if (dcsr_step_we        ) { r_dcsr.step          = dcsr_step_val;       }
+        if (sw_dcsr_nmip_we     ) { r_dcsr.nmip         = wdata[3..3];          } else if (dcsr_nmip_we        ) { r_dcsr.nmip          = dcsr_nmip_val;       }
+        if (sw_dcsr_mprven_we   ) { r_dcsr.mprven       = wdata[4..4];          } else if (dcsr_mprven_we      ) { r_dcsr.mprven        = dcsr_mprven_val;     }
+        if (sw_dcsr_v_we        ) { r_dcsr.v            = wdata[5..5];          } else if (dcsr_v_we           ) { r_dcsr.v             = dcsr_v_val;          }
+        if (sw_dcsr_cause_we    ) { r_dcsr.cause        = wdata[8..6];          } else if (dcsr_cause_we       ) { r_dcsr.cause         = dcsr_cause_val;      }
+        if (sw_dcsr_stoptime_we ) { r_dcsr.stoptime     = wdata[9..9];          } else if (dcsr_stoptime_we    ) { r_dcsr.stoptime      = dcsr_stoptime_val;   }
+        if (sw_dcsr_stopcount_we) { r_dcsr.stopcount    = wdata[10..10];        } else if (dcsr_stopcount_we   ) { r_dcsr.stopcount     = dcsr_stopcount_val;  }
+        if (sw_dcsr_stepie_we   ) { r_dcsr.stepie       = wdata[11..11];        } else if (dcsr_stepie_we      ) { r_dcsr.stepie        = dcsr_stepie_val;     }
+        if (sw_dcsr_ebreaku_we  ) { r_dcsr.ebreaku      = wdata[12..12];        } else if (dcsr_ebreaku_we     ) { r_dcsr.ebreaku       = dcsr_ebreaku_val;    }
+        if (sw_dcsr_ebreaks_we  ) { r_dcsr.ebreaks      = wdata[13..13];        } else if (dcsr_ebreaks_we     ) { r_dcsr.ebreaks       = dcsr_ebreaks_val;    }
+        if (sw_dcsr_ebreakm_we  ) { r_dcsr.ebreakm      = wdata[15..15];        } else if (dcsr_ebreakm_we     ) { r_dcsr.ebreakm       = dcsr_ebreakm_val;    }
+        if (sw_dcsr_ebreakvu_we ) { r_dcsr.ebreakvu     = wdata[16..16];        } else if (dcsr_ebreakvu_we    ) { r_dcsr.ebreakvu      = dcsr_ebreakvu_val;   }
+        if (sw_dcsr_ebreakvs_we ) { r_dcsr.ebreakvs     = wdata[17..17];        } else if (dcsr_ebreakvs_we    ) { r_dcsr.ebreakvs      = dcsr_ebreakvs_val;   }
+        if (sw_dcsr_debugver_we ) { r_dcsr.debugver     = wdata[31..28];        } else if (dcsr_debugver_we    ) { r_dcsr.debugver      = dcsr_debugver_val;   }
+        if (sw_dpc_dpc_we       ) { r_dpc.dpc           = wdata[63..1];         } else if (dpc_dpc_we          ) { r_dpc.dpc            = dpc_dpc_val;         }
+        if (sw_mcachestatus_icache_disabled_we) { r_mcachestatus.icache_disabled= wdata[0..0];          } else if (mcachestatus_icache_disabled_we) { r_mcachestatus.icache_disabled = mcachestatus_icache_disabled_val;}
+        if (sw_mcachestatus_icache_pref_disabled_we) { r_mcachestatus.icache_pref_disabled= wdata[1..1];          } else if (mcachestatus_icache_pref_disabled_we) { r_mcachestatus.icache_pref_disabled = mcachestatus_icache_pref_disabled_val;}
+        if (sw_mcachestatus_dcache_disabled_we) { r_mcachestatus.dcache_disabled= wdata[8..8];          } else if (mcachestatus_dcache_disabled_we) { r_mcachestatus.dcache_disabled = mcachestatus_dcache_disabled_val;}
+        if (sw_mcachestatus_dcache_pref_disabled_we) { r_mcachestatus.dcache_pref_disabled= wdata[9..9];          } else if (mcachestatus_dcache_pref_disabled_we) { r_mcachestatus.dcache_pref_disabled = mcachestatus_dcache_pref_disabled_val;}
+        if (sw_mcachestatus_l2cache_disabled_we) { r_mcachestatus.l2cache_disabled= wdata[16..16];        } else if (mcachestatus_l2cache_disabled_we) { r_mcachestatus.l2cache_disabled = mcachestatus_l2cache_disabled_val;}
+        if (sw_mcachestatus_wfi_stop_mode_we) { r_mcachestatus.wfi_stop_mode= wdata[24..24];        } else if (mcachestatus_wfi_stop_mode_we) { r_mcachestatus.wfi_stop_mode = mcachestatus_wfi_stop_mode_val;}
+        if (sw_mcycle_we        ) { r_mcycle            = wdata[63..0];         } else if (mcycle_we           ) { r_mcycle             = mcycle_val;          }
+        if (sw_minstret_we      ) { r_minstret          = wdata[63..0];         } else if (minstret_we         ) { r_minstret           = minstret_val;        }
+        if (sw_mhpmcounter3_we  ) { r_mhpmcounter3      = wdata[63..0];         } else if (mhpmcounter3_we     ) { r_mhpmcounter3       = mhpmcounter3_val;    }
+        if (sw_mhpmcounter4_we  ) { r_mhpmcounter4      = wdata[63..0];         } else if (mhpmcounter4_we     ) { r_mhpmcounter4       = mhpmcounter4_val;    }
+        if (sw_mhpmcounter5_we  ) { r_mhpmcounter5      = wdata[63..0];         } else if (mhpmcounter5_we     ) { r_mhpmcounter5       = mhpmcounter5_val;    }
+        if (sw_mhpmcounter6_we  ) { r_mhpmcounter6      = wdata[63..0];         } else if (mhpmcounter6_we     ) { r_mhpmcounter6       = mhpmcounter6_val;    }
+        if (sw_mhartid_we       ) { r_mhartid           = wdata[63..0];         } else if (mhartid_we          ) { r_mhartid            = mhartid_val;         }
+        if (sw_mconfigptr_we    ) { r_mconfigptr        = wdata[63..0];         } else if (mconfigptr_we       ) { r_mconfigptr         = mconfigptr_val;      }
+
+
+        //Add assertions
+        if (sw_fcsr_fflags_we & fcsr_fflags_we)
+        {
+            codal_assert(false, "Attempts to write fcsr_fflags during CSR write!");
+        }
+        if (sw_fcsr_frm_we & fcsr_frm_we)
+        {
+            codal_assert(false, "Attempts to write fcsr_frm during CSR write!");
+        }
+        if (sw_vcsr_vxsat_we & vcsr_vxsat_we)
+        {
+            codal_assert(false, "Attempts to write vcsr_vxsat during CSR write!");
+        }
+        if (sw_vcsr_vxrm_we & vcsr_vxrm_we)
+        {
+            codal_assert(false, "Attempts to write vcsr_vxrm during CSR write!");
+        }
+        if (sw_sepc_epc_we & sepc_epc_we)
+        {
+            codal_assert(false, "Attempts to write sepc_epc during CSR write!");
+        }
+        if (sw_scause_expt_we & scause_expt_we)
+        {
+            codal_assert(false, "Attempts to write scause_expt during CSR write!");
+        }
+        if (sw_scause_intr_we & scause_intr_we)
+        {
+            codal_assert(false, "Attempts to write scause_intr during CSR write!");
+        }
+        if (sw_stval_we & stval_we)
+        {
+            codal_assert(false, "Attempts to write stval during CSR write!");
+        }
+        if (sw_mstatus_sie_we & mstatus_sie_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_sie during CSR write!");
+        }
+        if (sw_mstatus_mie_we & mstatus_mie_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_mie during CSR write!");
+        }
+        if (sw_mstatus_spie_we & mstatus_spie_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_spie during CSR write!");
+        }
+        if (sw_mstatus_ube_we & mstatus_ube_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_ube during CSR write!");
+        }
+        if (sw_mstatus_mpie_we & mstatus_mpie_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_mpie during CSR write!");
+        }
+        if (sw_mstatus_spp_we & mstatus_spp_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_spp during CSR write!");
+        }
+        if (sw_mstatus_vs_we & mstatus_vs_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_vs during CSR write!");
+        }
+        if (sw_mstatus_mpp_we & mstatus_mpp_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_mpp during CSR write!");
+        }
+        if (sw_mstatus_fs_we & mstatus_fs_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_fs during CSR write!");
+        }
+        if (sw_mstatus_xs_we & mstatus_xs_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_xs during CSR write!");
+        }
+        if (sw_mstatus_mprv_we & mstatus_mprv_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_mprv during CSR write!");
+        }
+        if (sw_mstatus_sum_we & mstatus_sum_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_sum during CSR write!");
+        }
+        if (sw_mstatus_mxr_we & mstatus_mxr_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_mxr during CSR write!");
+        }
+        if (sw_mstatus_tvm_we & mstatus_tvm_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_tvm during CSR write!");
+        }
+        if (sw_mstatus_tw_we & mstatus_tw_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_tw during CSR write!");
+        }
+        if (sw_mstatus_tsr_we & mstatus_tsr_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_tsr during CSR write!");
+        }
+        if (sw_mstatus_uxl_we & mstatus_uxl_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_uxl during CSR write!");
+        }
+        if (sw_mstatus_sxl_we & mstatus_sxl_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_sxl during CSR write!");
+        }
+        if (sw_mstatus_sbe_we & mstatus_sbe_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_sbe during CSR write!");
+        }
+        if (sw_mstatus_mbe_we & mstatus_mbe_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_mbe during CSR write!");
+        }
+        if (sw_mstatus_sd_we & mstatus_sd_we)
+        {
+            codal_assert(false, "Attempts to write mstatus_sd during CSR write!");
+        }
+        if (sw_mepc_epc_we & mepc_epc_we)
+        {
+            codal_assert(false, "Attempts to write mepc_epc during CSR write!");
+        }
+        if (sw_mcause_expt_we & mcause_expt_we)
+        {
+            codal_assert(false, "Attempts to write mcause_expt during CSR write!");
+        }
+        if (sw_mcause_intr_we & mcause_intr_we)
+        {
+            codal_assert(false, "Attempts to write mcause_intr during CSR write!");
+        }
+        if (sw_mtval_we & mtval_we)
+        {
+            codal_assert(false, "Attempts to write mtval during CSR write!");
+        }
+        if (sw_mip_ssip_we & mip_ssip_we)
+        {
+            codal_assert(false, "Attempts to write mip_ssip during CSR write!");
+        }
+        if (sw_mip_msip_we & mip_msip_we)
+        {
+            codal_assert(false, "Attempts to write mip_msip during CSR write!");
+        }
+        if (sw_mip_stip_we & mip_stip_we)
+        {
+            codal_assert(false, "Attempts to write mip_stip during CSR write!");
+        }
+        if (sw_mip_mtip_we & mip_mtip_we)
+        {
+            codal_assert(false, "Attempts to write mip_mtip during CSR write!");
+        }
+        if (sw_mip_seip_we & mip_seip_we)
+        {
+            codal_assert(false, "Attempts to write mip_seip during CSR write!");
+        }
+        if (sw_mip_meip_we & mip_meip_we)
+        {
+            codal_assert(false, "Attempts to write mip_meip during CSR write!");
+        }
+        if (sw_tdata1_we & tdata1_we)
+        {
+            codal_assert(false, "Attempts to write tdata1 during CSR write!");
+        }
+        if (sw_dcsr_prv_we & dcsr_prv_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_prv during CSR write!");
+        }
+        if (sw_dcsr_step_we & dcsr_step_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_step during CSR write!");
+        }
+        if (sw_dcsr_nmip_we & dcsr_nmip_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_nmip during CSR write!");
+        }
+        if (sw_dcsr_mprven_we & dcsr_mprven_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_mprven during CSR write!");
+        }
+        if (sw_dcsr_v_we & dcsr_v_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_v during CSR write!");
+        }
+        if (sw_dcsr_cause_we & dcsr_cause_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_cause during CSR write!");
+        }
+        if (sw_dcsr_stoptime_we & dcsr_stoptime_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_stoptime during CSR write!");
+        }
+        if (sw_dcsr_stopcount_we & dcsr_stopcount_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_stopcount during CSR write!");
+        }
+        if (sw_dcsr_stepie_we & dcsr_stepie_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_stepie during CSR write!");
+        }
+        if (sw_dcsr_ebreaku_we & dcsr_ebreaku_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_ebreaku during CSR write!");
+        }
+        if (sw_dcsr_ebreaks_we & dcsr_ebreaks_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_ebreaks during CSR write!");
+        }
+        if (sw_dcsr_ebreakm_we & dcsr_ebreakm_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_ebreakm during CSR write!");
+        }
+        if (sw_dcsr_ebreakvu_we & dcsr_ebreakvu_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_ebreakvu during CSR write!");
+        }
+        if (sw_dcsr_ebreakvs_we & dcsr_ebreakvs_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_ebreakvs during CSR write!");
+        }
+        if (sw_dcsr_debugver_we & dcsr_debugver_we)
+        {
+            codal_assert(false, "Attempts to write dcsr_debugver during CSR write!");
+        }
+        if (sw_dpc_dpc_we & dpc_dpc_we)
+        {
+            codal_assert(false, "Attempts to write dpc_dpc during CSR write!");
+        }
+        if (sw_mcachestatus_icache_disabled_we & mcachestatus_icache_disabled_we)
+        {
+            codal_assert(false, "Attempts to write mcachestatus_icache_disabled during CSR write!");
+        }
+        if (sw_mcachestatus_icache_pref_disabled_we & mcachestatus_icache_pref_disabled_we)
+        {
+            codal_assert(false, "Attempts to write mcachestatus_icache_pref_disabled during CSR write!");
+        }
+        if (sw_mcachestatus_dcache_disabled_we & mcachestatus_dcache_disabled_we)
+        {
+            codal_assert(false, "Attempts to write mcachestatus_dcache_disabled during CSR write!");
+        }
+        if (sw_mcachestatus_dcache_pref_disabled_we & mcachestatus_dcache_pref_disabled_we)
+        {
+            codal_assert(false, "Attempts to write mcachestatus_dcache_pref_disabled during CSR write!");
+        }
+        if (sw_mcachestatus_l2cache_disabled_we & mcachestatus_l2cache_disabled_we)
+        {
+            codal_assert(false, "Attempts to write mcachestatus_l2cache_disabled during CSR write!");
+        }
+        if (sw_mcachestatus_wfi_stop_mode_we & mcachestatus_wfi_stop_mode_we)
+        {
+            codal_assert(false, "Attempts to write mcachestatus_wfi_stop_mode during CSR write!");
+        }
+        if (sw_mcycle_we & mcycle_we)
+        {
+            codal_assert(false, "Attempts to write mcycle during CSR write!");
+        }
+        if (sw_minstret_we & minstret_we)
+        {
+            codal_assert(false, "Attempts to write minstret during CSR write!");
+        }
+        if (sw_mhpmcounter3_we & mhpmcounter3_we)
+        {
+            codal_assert(false, "Attempts to write mhpmcounter3 during CSR write!");
+        }
+        if (sw_mhpmcounter4_we & mhpmcounter4_we)
+        {
+            codal_assert(false, "Attempts to write mhpmcounter4 during CSR write!");
+        }
+        if (sw_mhpmcounter5_we & mhpmcounter5_we)
+        {
+            codal_assert(false, "Attempts to write mhpmcounter5 during CSR write!");
+        }
+        if (sw_mhpmcounter6_we & mhpmcounter6_we)
+        {
+            codal_assert(false, "Attempts to write mhpmcounter6 during CSR write!");
+        }
+        if (sw_mhartid_we & mhartid_we)
+        {
+            codal_assert(false, "Attempts to write mhartid during CSR write!");
+        }
+        if (sw_mconfigptr_we & mconfigptr_we)
+        {
+            codal_assert(false, "Attempts to write mconfigptr during CSR write!");
+        }
+
+    }
+
+
+
+};
+  
