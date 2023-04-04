@@ -1,0 +1,281 @@
+#include "shared_defines.hcodal"
+
+#if (OPTION_XLEN == 64)
+struct swr_t
+{
+    uint1      fcsr;
+    uint1      vstart;
+    uint1      vcsr;
+    uint1      stvec;
+    uint1      scounteren;
+    uint1      senvcfg;
+    uint1      sscratch;
+    uint1      sepc;
+    uint1      scause;
+    uint1      stval;
+    uint1      satp;
+    uint1      mstatus;
+    uint1      medeleg;
+    uint1      mideleg;
+    uint1      mie;
+    uint1      mtvec;
+    uint1      mcounteren;
+    uint1      menvcfg;
+    uint1      mcountinhibit;
+    uint1      mhpmevent3;
+    uint1      mhpmevent4;
+    uint1      mhpmevent5;
+    uint1      mhpmevent6;
+    uint1      mscratch;
+    uint1      mepc;
+    uint1      mcause;
+    uint1      mtval;
+    uint1      mip;
+    uint1      pmpcfg0;
+    uint1      pmpcfg2;
+    uint1      pmpcfg4;
+    uint1      pmpcfg6;
+    uint1      pmpaddr0;
+    uint1      pmpaddr1;
+    uint1      pmpaddr2;
+    uint1      pmpaddr3;
+    uint1      pmpaddr4;
+    uint1      pmpaddr5;
+    uint1      pmpaddr6;
+    uint1      pmpaddr7;
+    uint1      pmpaddr8;
+    uint1      pmpaddr9;
+    uint1      pmpaddr10;
+    uint1      pmpaddr11;
+    uint1      pmpaddr12;
+    uint1      pmpaddr13;
+    uint1      pmpaddr14;
+    uint1      pmpaddr15;
+    uint1      sbpredctrl;
+    uint1      tselect;
+    uint1      tdata1;
+    uint1      tdata2;
+    uint1      tinfo;
+    uint1      dcsr;
+    uint1      dpc;
+    uint1      dscratch0;
+    uint1      dscratch1;
+    uint1      mcfgctrl;
+    uint1      mdcachectrl;
+    uint1      micachectrl;
+    uint1      ml2cachectrl;
+    uint1      mcycle;
+    uint1      minstret;
+    uint1      mhpmcounter3;
+    uint1      mhpmcounter4;
+    uint1      mhpmcounter5;
+    uint1      mhpmcounter6;
+};
+#endif //(OPTION_XLEN == 64)
+
+#if (OPTION_XLEN == 32)
+struct swr_t
+{
+    uint1      fcsr;
+    uint1      stvec;
+    uint1      scounteren;
+    uint1      senvcfg;
+    uint1      sscratch;
+    uint1      sepc;
+    uint1      scause;
+    uint1      stval;
+    uint1      satp;
+    uint1      mstatus;
+    uint1      medeleg;
+    uint1      mideleg;
+    uint1      mie;
+    uint1      mtvec;
+    uint1      mcounteren;
+    uint1      menvcfg;
+    uint1      mstatush;
+    uint1      menvcfgh;
+    uint1      mcountinhibit;
+    uint1      mhpmevent3;
+    uint1      mhpmevent4;
+    uint1      mhpmevent5;
+    uint1      mhpmevent6;
+    uint1      mscratch;
+    uint1      mepc;
+    uint1      mcause;
+    uint1      mtval;
+    uint1      mip;
+    uint1      pmpcfg0;
+    uint1      pmpcfg1;
+    uint1      pmpcfg2;
+    uint1      pmpcfg3;
+    uint1      pmpcfg4;
+    uint1      pmpcfg5;
+    uint1      pmpcfg6;
+    uint1      pmpcfg7;
+    uint1      pmpaddr0;
+    uint1      pmpaddr1;
+    uint1      pmpaddr2;
+    uint1      pmpaddr3;
+    uint1      pmpaddr4;
+    uint1      pmpaddr5;
+    uint1      pmpaddr6;
+    uint1      pmpaddr7;
+    uint1      pmpaddr8;
+    uint1      pmpaddr9;
+    uint1      pmpaddr10;
+    uint1      pmpaddr11;
+    uint1      pmpaddr12;
+    uint1      pmpaddr13;
+    uint1      pmpaddr14;
+    uint1      pmpaddr15;
+    uint1      sbpredctrl;
+    uint1      tselect;
+    uint1      tdata1;
+    uint1      tdata2;
+    uint1      tinfo;
+    uint1      dcsr;
+    uint1      dpc;
+    uint1      dscratch0;
+    uint1      dscratch1;
+    uint1      mcfgctrl;
+    uint1      mdcachectrl;
+    uint1      micachectrl;
+    uint1      mcycle;
+    uint1      minstret;
+    uint1      mhpmcounter3;
+    uint1      mhpmcounter4;
+    uint1      mhpmcounter5;
+    uint1      mhpmcounter6;
+    uint1      mcycleh;
+    uint1      minstreth;
+    uint1      mhpmcounter3h;
+    uint1      mhpmcounter4h;
+    uint1      mhpmcounter5h;
+    uint1      mhpmcounter6h;
+};
+#endif //(OPTION_XLEN == 32)
+
+#if (OPTION_XLEN == 64)
+struct hwr_t
+{
+    uint1      fcsr;
+    uint1      vcsr;
+    uint1      sepc;
+    uint1      scause;
+    uint1      stval;
+    uint1      mstatus;
+    uint1      mepc;
+    uint1      mcause;
+    uint1      mtval;
+    uint1      mip;
+    uint1      tdata1;
+    uint1      dcsr;
+    uint1      dpc;
+    uint1      mcachestatus;
+    uint1      mcycle;
+    uint1      minstret;
+    uint1      mhpmcounter3;
+    uint1      mhpmcounter4;
+    uint1      mhpmcounter5;
+    uint1      mhpmcounter6;
+    uint1      mhartid;
+    uint1      mconfigptr;
+};
+#endif //(OPTION_XLEN == 64)
+
+#if (OPTION_XLEN == 32)
+struct hwr_t
+{
+    uint1      fcsr;
+    uint1      sepc;
+    uint1      scause;
+    uint1      stval;
+    uint1      mstatus;
+    uint1      mstatush;
+    uint1      mepc;
+    uint1      mcause;
+    uint1      mtval;
+    uint1      mip;
+    uint1      tdata1;
+    uint1      dcsr;
+    uint1      dpc;
+    uint1      mcachestatus;
+    uint1      mcycle;
+    uint1      minstret;
+    uint1      mhpmcounter3;
+    uint1      mhpmcounter4;
+    uint1      mhpmcounter5;
+    uint1      mhpmcounter6;
+    uint1      mcycleh;
+    uint1      minstreth;
+    uint1      mhpmcounter3h;
+    uint1      mhpmcounter4h;
+    uint1      mhpmcounter5h;
+    uint1      mhpmcounter6h;
+    uint1      mhartid;
+    uint1      mconfigptr;
+};
+#endif //(OPTION_XLEN == 32)
+
+#if (OPTION_XLEN == 64)
+struct hwdata_t
+{
+    uint_<{XLEN}>    fcsr;
+    uint_<{XLEN}>    vcsr;
+    uint_<{XLEN}>    sepc;
+    uint_<{XLEN}>    scause;
+    uint_<{XLEN}>    stval;
+    uint_<{XLEN}>    mstatus;
+    uint_<{XLEN}>    mepc;
+    uint_<{XLEN}>    mcause;
+    uint_<{XLEN}>    mtval;
+    uint_<{XLEN}>    mip;
+    uint_<{XLEN}>    tdata1;
+    uint_<{XLEN}>    dcsr;
+    uint_<{XLEN}>    dpc;
+    uint_<{XLEN}>    mcachestatus;
+    uint_<{XLEN}>    mcycle;
+    uint_<{XLEN}>    minstret;
+    uint_<{XLEN}>    mhpmcounter3;
+    uint_<{XLEN}>    mhpmcounter4;
+    uint_<{XLEN}>    mhpmcounter5;
+    uint_<{XLEN}>    mhpmcounter6;
+    uint_<{XLEN}>    mhartid;
+    uint_<{XLEN}>    mconfigptr;
+};
+#endif //(OPTION_XLEN == 64)
+
+#if (OPTION_XLEN == 32)
+struct hwdata_t
+{
+    uint_<{XLEN}>    fcsr;
+    uint_<{XLEN}>    sepc;
+    uint_<{XLEN}>    scause;
+    uint_<{XLEN}>    stval;
+    uint_<{XLEN}>    mstatus;
+    uint_<{XLEN}>    mstatush;
+    uint_<{XLEN}>    mepc;
+    uint_<{XLEN}>    mcause;
+    uint_<{XLEN}>    mtval;
+    uint_<{XLEN}>    mip;
+    uint_<{XLEN}>    tdata1;
+    uint_<{XLEN}>    dcsr;
+    uint_<{XLEN}>    dpc;
+    uint_<{XLEN}>    mcachestatus;
+    uint_<{XLEN}>    mcycle;
+    uint_<{XLEN}>    minstret;
+    uint_<{XLEN}>    mhpmcounter3;
+    uint_<{XLEN}>    mhpmcounter4;
+    uint_<{XLEN}>    mhpmcounter5;
+    uint_<{XLEN}>    mhpmcounter6;
+    uint_<{XLEN}>    mcycleh;
+    uint_<{XLEN}>    minstreth;
+    uint_<{XLEN}>    mhpmcounter3h;
+    uint_<{XLEN}>    mhpmcounter4h;
+    uint_<{XLEN}>    mhpmcounter5h;
+    uint_<{XLEN}>    mhpmcounter6h;
+    uint_<{XLEN}>    mhartid;
+    uint_<{XLEN}>    mconfigptr;
+};
+#endif //(OPTION_XLEN == 32)
+
