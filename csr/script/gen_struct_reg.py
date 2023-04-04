@@ -28,8 +28,8 @@ if __name__ == "__main__":
     rowx_struct_wr64 = ''
     rowx_struct_wr32 = ''
     
-    #with open(output_file_struct, mode='w', newline = '') as codal_struct, open(output_file_struct_conv, mode='w', newline = '') as codal_struct_conv:
-    with open(output_file_struct, mode='w', newline = '') as codal_struct:
+    with open(output_file_struct, mode='w', newline = '') as codal_struct, open(output_file_struct_conv, mode='w', newline = '') as codal_struct_conv:
+    #with open(output_file_struct, mode='w', newline = '') as codal_struct:
 
         final_struct64 = ''
         final_struct32 = ''

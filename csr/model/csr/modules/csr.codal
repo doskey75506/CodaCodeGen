@@ -1294,23 +1294,15 @@ module csr_t
     }
 
     // Pattern 1E: SRW + RD-EN/ROZ, XLEN
-    xlen_t proc_pmpaddr7_rd(s_pmpaddr7_en) {
+    automatic void proc_pmpaddr7(void) {
         // Read
         if (s_pmpaddr7_en)
             s_rdata_pmpaddr7 = r_pmpaddr7;
         else
             s_rdata_pmpaddr7 = 0;
-        return s_rdata_pmpaddr7
-    }
-    automatic proc_pmpaddr7_wr(s_pmpaddr7_en, s_swr.pmpaddr7, xlen_t s_swdata) {
         // Write
         if (s_swr.pmpaddr7)
             r_pmpaddr7 = s_swdata;
-        return s_rdata_pmpaddr7
-    }
-    automatic void proc_pmpaddr7(void) {
-                proc_pmpaddr7_rd()
-                proc_pmpaddr7_wr()
     }
 
     // Pattern 1E: SRW + RD-EN/ROZ, XLEN

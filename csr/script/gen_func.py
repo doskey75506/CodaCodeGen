@@ -10,7 +10,7 @@ wpri_in_struct = False
 struct_rd_middle_only = True
 struct_wr_middle_only = True
 s_rdata_is_struct_in_pattern = False
-gen_struct_conv = False
+gen_struct_conv = True
 
 #--------------------------------------------------------------------------------
 # Register Read/Write Patterns
