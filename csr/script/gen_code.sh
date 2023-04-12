@@ -9,7 +9,7 @@ OUT_FILE_STRUCT_REG=./model/csr/include/csr_struct_reg.codal
 OUT_FILE_STRUCT_CONV=./model/csr/modules/csr_data_conv.codal
 OUT_FILE_STRUCT_WIRE=./model/csr/include/csr_struct_wire.codal
 UPDT_FILE_CSR=./model/csr/modules/csr.codal
-
+git
 
 #clean
 rm $OUT_FILE_DEF_ADDR

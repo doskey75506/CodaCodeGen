@@ -1190,3 +1190,28 @@ def gen_end_code():
 };
   """
   return end_str
+
+
+def longest_common_leader(str1, str2):
+    idx = min(len(str1), len(str2))
+    for i in range(idx):
+        if str1[i] != str2[i]:
+            idx = i
+            break
+    common_header = str1[:idx]
+    tail1 = str1[idx:]
+    tail2 = str2[idx:]
+    return common_header, tail1, tail2
+
+
+if __name__ == '__main__':
+    # Test longest_common_leader
+
+    str1 = 'abcde'
+    str2 = 'abcdf'
+    str3 = 'abcdefg'
+    str4 = ''
+    diff12 = longest_common_leader(str1, str2)
+    diff13 = longest_common_leader(str1, str3)
+    diff14 = longest_common_leader(str1, str4)
+    print(diff12, diff13, diff14)
