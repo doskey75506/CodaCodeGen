@@ -140,7 +140,12 @@ module csr_data_conv_t
         struct scause_t scause)
     {
         uint_<{XLEN}> rdata;
-        rdata = scause.intr :: (uint_<{XLEN-7 })0 :: scause.expt;
+#if (OPTION_XLEN == 64)
+        rdata = scause.intr :: (uint57)0 :: scause.expt;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = scause.intr :: (uint25)0 :: scause.expt;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -268,7 +273,12 @@ module csr_data_conv_t
         struct misa_t misa)
     {
         uint_<{XLEN}> rdata;
-        rdata = misa.mxl :: (uint_<{XLEN-28 })0 :: misa.z :: misa.y :: misa.x :: misa.w :: misa.v :: misa.u :: misa.t :: misa.s :: misa.r :: misa.q :: misa.p :: misa.o :: misa.n :: misa.m :: misa.l :: misa.k :: misa.j :: misa.i :: misa.h :: misa.g :: misa.f :: misa.e :: misa.d :: misa.c :: misa.b :: misa.a;
+#if (OPTION_XLEN == 64)
+        rdata = misa.mxl :: (uint36)0 :: misa.z :: misa.y :: misa.x :: misa.w :: misa.v :: misa.u :: misa.t :: misa.s :: misa.r :: misa.q :: misa.p :: misa.o :: misa.n :: misa.m :: misa.l :: misa.k :: misa.j :: misa.i :: misa.h :: misa.g :: misa.f :: misa.e :: misa.d :: misa.c :: misa.b :: misa.a;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = misa.mxl :: (uint4)0 :: misa.z :: misa.y :: misa.x :: misa.w :: misa.v :: misa.u :: misa.t :: misa.s :: misa.r :: misa.q :: misa.p :: misa.o :: misa.n :: misa.m :: misa.l :: misa.k :: misa.j :: misa.i :: misa.h :: misa.g :: misa.f :: misa.e :: misa.d :: misa.c :: misa.b :: misa.a;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -347,7 +357,12 @@ module csr_data_conv_t
         struct medeleg_t medeleg)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-16 })0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
+#if (OPTION_XLEN == 64)
+        rdata = (uint48)0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint16)0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -382,7 +397,12 @@ module csr_data_conv_t
         struct mideleg_t mideleg)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-12 })0 :: mideleg.meid :: (uint1)0 :: mideleg.seid :: (uint1)0 :: mideleg.mtid :: (uint1)0 :: mideleg.stid :: (uint1)0 :: mideleg.msid :: (uint1)0 :: mideleg.ssid :: (uint1)0;
+#if (OPTION_XLEN == 64)
+        rdata = (uint52)0 :: mideleg.meid :: (uint1)0 :: mideleg.seid :: (uint1)0 :: mideleg.mtid :: (uint1)0 :: mideleg.stid :: (uint1)0 :: mideleg.msid :: (uint1)0 :: mideleg.ssid :: (uint1)0;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint20)0 :: mideleg.meid :: (uint1)0 :: mideleg.seid :: (uint1)0 :: mideleg.mtid :: (uint1)0 :: mideleg.stid :: (uint1)0 :: mideleg.msid :: (uint1)0 :: mideleg.ssid :: (uint1)0;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -409,7 +429,12 @@ module csr_data_conv_t
         struct mie_t mie)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-12 })0 :: mie.meie :: (uint1)0 :: mie.seie :: (uint1)0 :: mie.mtie :: (uint1)0 :: mie.stie :: (uint1)0 :: mie.msie :: (uint1)0 :: mie.ssie :: (uint1)0;
+#if (OPTION_XLEN == 64)
+        rdata = (uint52)0 :: mie.meie :: (uint1)0 :: mie.seie :: (uint1)0 :: mie.mtie :: (uint1)0 :: mie.stie :: (uint1)0 :: mie.msie :: (uint1)0 :: mie.ssie :: (uint1)0;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint20)0 :: mie.meie :: (uint1)0 :: mie.seie :: (uint1)0 :: mie.mtie :: (uint1)0 :: mie.stie :: (uint1)0 :: mie.msie :: (uint1)0 :: mie.ssie :: (uint1)0;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -703,7 +728,12 @@ module csr_data_conv_t
         struct mcause_t mcause)
     {
         uint_<{XLEN}> rdata;
-        rdata = mcause.intr :: (uint_<{XLEN-7 })0 :: mcause.expt;
+#if (OPTION_XLEN == 64)
+        rdata = mcause.intr :: (uint57)0 :: mcause.expt;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = mcause.intr :: (uint25)0 :: mcause.expt;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -732,7 +762,12 @@ module csr_data_conv_t
         struct mip_t mip)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-12 })0 :: mip.meip :: (uint1)0 :: mip.seip :: (uint1)0 :: mip.mtip :: (uint1)0 :: mip.stip :: (uint1)0 :: mip.msip :: (uint1)0 :: mip.ssip :: (uint1)0;
+#if (OPTION_XLEN == 64)
+        rdata = (uint52)0 :: mip.meip :: (uint1)0 :: mip.seip :: (uint1)0 :: mip.mtip :: (uint1)0 :: mip.stip :: (uint1)0 :: mip.msip :: (uint1)0 :: mip.ssip :: (uint1)0;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint20)0 :: mip.meip :: (uint1)0 :: mip.seip :: (uint1)0 :: mip.mtip :: (uint1)0 :: mip.stip :: (uint1)0 :: mip.msip :: (uint1)0 :: mip.ssip :: (uint1)0;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -759,7 +794,12 @@ module csr_data_conv_t
         struct sbpredctrl_t sbpredctrl)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-1 })0 :: sbpredctrl.flush_bpred;
+#if (OPTION_XLEN == 64)
+        rdata = (uint63)0 :: sbpredctrl.flush_bpred;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint31)0 :: sbpredctrl.flush_bpred;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -781,7 +821,12 @@ module csr_data_conv_t
         struct tselect_t tselect)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-2 })0 :: tselect.idx;
+#if (OPTION_XLEN == 64)
+        rdata = (uint62)0 :: tselect.idx;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint30)0 :: tselect.idx;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -866,7 +911,12 @@ module csr_data_conv_t
         struct mcfgctrl_t mcfgctrl)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-17 })0 :: mcfgctrl.dis_large_tlb_page :: (uint8)0 :: mcfgctrl.dis_br_pred :: mcfgctrl.dis_spec_state_issue :: mcfgctrl.dis_slot1 :: mcfgctrl.dis_alu_logic_dual_issue :: mcfgctrl.dis_mv_dual_issue :: mcfgctrl.dis_alu_agu_dual_issue :: mcfgctrl.dis_all_dual_issue :: mcfgctrl.dis_late_alu;
+#if (OPTION_XLEN == 64)
+        rdata = (uint47)0 :: mcfgctrl.dis_large_tlb_page :: (uint8)0 :: mcfgctrl.dis_br_pred :: mcfgctrl.dis_spec_state_issue :: mcfgctrl.dis_slot1 :: mcfgctrl.dis_alu_logic_dual_issue :: mcfgctrl.dis_mv_dual_issue :: mcfgctrl.dis_alu_agu_dual_issue :: mcfgctrl.dis_all_dual_issue :: mcfgctrl.dis_late_alu;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint15)0 :: mcfgctrl.dis_large_tlb_page :: (uint8)0 :: mcfgctrl.dis_br_pred :: mcfgctrl.dis_spec_state_issue :: mcfgctrl.dis_slot1 :: mcfgctrl.dis_alu_logic_dual_issue :: mcfgctrl.dis_mv_dual_issue :: mcfgctrl.dis_alu_agu_dual_issue :: mcfgctrl.dis_all_dual_issue :: mcfgctrl.dis_late_alu;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -896,7 +946,12 @@ module csr_data_conv_t
         struct mcachestatus_t mcachestatus)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-25 })0 :: mcachestatus.wfi_stop_mode :: (uint7)0 :: mcachestatus.l2cache_disabled :: (uint6)0 :: mcachestatus.dcache_pref_disabled :: mcachestatus.dcache_disabled :: (uint6)0 :: mcachestatus.icache_pref_disabled :: mcachestatus.icache_disabled;
+#if (OPTION_XLEN == 64)
+        rdata = (uint39)0 :: mcachestatus.wfi_stop_mode :: (uint7)0 :: mcachestatus.l2cache_disabled :: (uint6)0 :: mcachestatus.dcache_pref_disabled :: mcachestatus.dcache_disabled :: (uint6)0 :: mcachestatus.icache_pref_disabled :: mcachestatus.icache_disabled;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint7)0 :: mcachestatus.wfi_stop_mode :: (uint7)0 :: mcachestatus.l2cache_disabled :: (uint6)0 :: mcachestatus.dcache_pref_disabled :: mcachestatus.dcache_disabled :: (uint6)0 :: mcachestatus.icache_pref_disabled :: mcachestatus.icache_disabled;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -923,7 +978,12 @@ module csr_data_conv_t
         struct mdcachectrl_t mdcachectrl)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-4 })0 :: mdcachectrl.manage_dcache;
+#if (OPTION_XLEN == 64)
+        rdata = (uint60)0 :: mdcachectrl.manage_dcache;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint28)0 :: mdcachectrl.manage_dcache;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -945,7 +1005,12 @@ module csr_data_conv_t
         struct micachectrl_t micachectrl)
     {
         uint_<{XLEN}> rdata;
-        rdata = (uint_<{XLEN-3 })0 :: micachectrl.manage_icache;
+#if (OPTION_XLEN == 64)
+        rdata = (uint61)0 :: micachectrl.manage_icache;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint29)0 :: micachectrl.manage_icache;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 
@@ -1023,7 +1088,12 @@ module csr_data_conv_t
         struct marchid_t marchid)
     {
         uint_<{XLEN}> rdata;
-        rdata = marchid.preset :: (uint_<{XLEN-29 })0 :: marchid.vector :: (uint4)0 :: marchid.cheri :: marchid.fusa :: marchid.archt :: (uint4)0 :: marchid.obilix;
+#if (OPTION_XLEN == 64)
+        rdata = marchid.preset :: (uint35)0 :: marchid.vector :: (uint4)0 :: marchid.cheri :: marchid.fusa :: marchid.archt :: (uint4)0 :: marchid.obilix;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = marchid.preset :: (uint3)0 :: marchid.vector :: (uint4)0 :: marchid.cheri :: marchid.fusa :: marchid.archt :: (uint4)0 :: marchid.obilix;
+#endif //(OPTION_XLEN == 32)
         return rdata;
     }
 

@@ -1192,26 +1192,109 @@ def gen_end_code():
   return end_str
 
 
-def longest_common_leader(str1, str2):
-    idx = min(len(str1), len(str2))
+def longest_common_leader(str1, str2):    # 示例字符串
+    def isdigit(string):
+        return re.match("^[0-9]+$", string)
+
+    # 正则表达式模式
+    still_common = True
+    pattern = r'(\d+|\D+)'
+    # 使用re.findall()方法获取匹配的子串
+    lineList1  = str1.split('\n')
+    lineList2 = str2.split('\n')
+
+    idx = min(len(lineList1), len(lineList2))
+    common_header = ''
     for i in range(idx):
-        if str1[i] != str2[i]:
-            idx = i
-            break
-    common_header = str1[:idx]
-    tail1 = str1[idx:]
-    tail2 = str2[idx:]
+        if lineList1[i] == lineList2[i]:
+            common_header += lineList1[i]
+        else:
+            # Find a line that not equal:
+            #   if the only unequal part of these two lines are digits and the value has a different of 32,
+            #   we still think them as equal ,but replace the digits with the expression of XLEN.
+            subList1 = re.findall(pattern, lineList1[i])
+            subList2 = re.findall(pattern, lineList2[i])
+            if len(subList1) != len(subList2):
+                still_common = False
+                idx = i
+                break
+
+
+            # Create a temp common line for this line.  Return it if successful, otherwise drop it.
+            common_line = ''
+            for j in range(len(subList1)):
+                if subList1[j] == subList2[j]:
+                    common_line += subList1[j]
+                    continue
+                else:
+                    if isdigit(subList1[j]) and isdigit(subList2[j]):
+                        int1 = int(subList1[j])
+                        int2 = int(subList2[j])
+                        if (abs(int1 - int2) == 32):
+                            varExpressiong = f'XLEN-{64 - max(int1, int2)}'
+                            if (subList1[j-1].endswith('uint')  or subList1[j-1].endswith('int') ):
+                                common_line += '_<{' + varExpressiong +' }'
+                            else:
+                                common_line += varExpressiong
+                        else:
+                            still_common = False
+                            break
+                    else:
+                        still_common = False
+                        break
+            if  still_common:
+                common_header += common_line
+            else:
+                idx = i
+                break
+
+    tail1 = '\n'.join(lineList1[idx:])
+    tail2 = '\n'.join(lineList2[idx:])
     return common_header, tail1, tail2
 
 
 if __name__ == '__main__':
     # Test longest_common_leader
 
-    str1 = 'abcde'
-    str2 = 'abcdf'
-    str3 = 'abcdefg'
-    str4 = ''
-    diff12 = longest_common_leader(str1, str2)
-    diff13 = longest_common_leader(str1, str3)
-    diff14 = longest_common_leader(str1, str4)
-    print(diff12, diff13, diff14)
+    str1 = """    public always uint_<{XLEN}> struct_rdata_unpack_medeleg(
+        struct medeleg_t medeleg)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint48)0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
+        return rdata;
+    }"""
+
+    str2 = """    public always uint_<{XLEN}> struct_rdata_unpack_medeleg(
+        struct medeleg_t medeleg)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint16)0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
+        return rdata;
+    }"""
+    str3 = """line 1
+    line2
+    line[63..60]
+    line: uint0
+    line4 Diff1
+    line5"""
+
+    str4 = """line 1
+    line2
+    line[31..28]
+    line: uint32
+    line4 Diff2
+    """
+
+
+    c, t1, t2 = longest_common_leader(str1, str2)
+
+    print('c12',c)
+    print('1', t1)
+    print('2', t2)
+
+    print('*******************')
+    c, t1, t2 = longest_common_leader(str3, str4)
+
+    print('c34',c)
+    print('3', t1)
+    print('4', t2)
