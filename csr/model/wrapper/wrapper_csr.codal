@@ -1,0 +1,290 @@
+/**
+ * Codasip s.r.o.
+ *
+ * CONFIDENTIAL
+ *
+ * Copyright 2022 Codasip s.r.o.
+ *
+ * All Rights Reserved.
+ *
+ * NOTICE: All information contained in this file, is and shall remain the property of
+ * Codasip s.r.o. and its suppliers, if any.
+ *
+ * The intellectual and technical concepts contained herein are confidential and proprietary to
+ * Codasip s.r.o. and are protected by trade secret and copyright law.  In addition, elements of the
+ * technical concepts may be patent pending.
+ *
+ * This file is part of the Codasip Studio product. No part of the Studio product, including this
+ * file, may be use, copied, modified, or distributed except in accordance with the terms contained
+ * in Codasip license agreement under which you obtained this file.
+ */
+#include "shared_defines.hcodal"
+
+settings
+{
+    compiler
+    {
+        pointer_size = 32;
+    };
+};
+
+pc register uint32 r_pc;
+
+interface if_lsu
+{
+    bits = { 32, 32, 8 };
+    type = AHB3_LITE:MASTER;
+    flag = RW;
+    endianness = LITTLE;
+};
+
+address_space as_all
+{
+    bits = { 32, 32, 8 };
+    type = ALL;
+    endianness = LITTLE;
+    interfaces = {
+        DATA: if_lsu
+    };
+};
+
+pipeline pipe { stage FE; stage ID; };
+
+slots sl = S0;
+
+element i_instr
+{
+    assembly { "nop" };
+    binary { (uint32)0 };
+
+    semantics
+    {
+        codal_nop();
+    };
+};
+
+set isa = i_instr;
+
+start
+{
+    // Whole ISA is used.
+    roots = { isa };
+};
+
+/**
+ *  \brief  General purpose register file
+ */
+arch register_file uint64 rf_xrf
+{
+    // Data ports.
+    dataport r0, r1, r2, r3 { flag = R; slots = { sl.S0 }; };
+    dataport w0     { flag = W; slots = { sl.S0 }; };
+    dataport w1     { flag = W; slots = { sl.S0 }; };
+    // Number of registers.
+    size = 32;
+    // Register 0 is always 0.
+    constant = {0, 0};
+    // This reg. file reset signal is connected. The default (after-reset) value is specified.
+    reset = true;
+    default = 0;
+    // Create a set with all register operands.
+};
+
+
+
+module main
+{
+    isa dec;
+    csr_t csr;
+
+    /**
+     *  \brief  Dummy integration, it won't be needed in the future.
+     */
+    always void dummy()
+    {
+        dont_touch bool   b;
+        dont_touch struct csr_ctrl_t ctrl;
+        dont_touch uint1  rdata_vld;
+        dont_touch uint64 rdata_out;        
+        dont_touch uint32 excep_arg;
+        dont_touch uint1  csr_excep;
+        dont_touch uint1  csr_inval_tlb_ex3;
+        dont_touch uint3  csr_refetch_ex3;
+        dont_touch uint1  csr_active_write;
+        dont_touch struct csr_plc_ctrl_t plc_instr_ex2;
+        dont_touch uint1  match_pc_0;
+        dont_touch uint1  match_pc_1;
+        dont_touch uint1  match_ls;
+        dont_touch uint3  frm;
+        dont_touch uint5  fflags;
+        dont_touch bool   dis_late_alu;
+        dont_touch bool   dis_all_dual_issue;
+        dont_touch bool   dis_alu_agu_dual_issue;
+        dont_touch bool   dis_mv_dual_issue;
+        dont_touch bool   dis_alu_logic_dual_issue;
+        dont_touch bool   dis_slot1;
+        dont_touch bool   dis_spec_state_issue;
+        dont_touch bool   dis_br_pred;
+        dont_touch uint4  manage_dcache;
+        dont_touch uint3  manage_icache;
+        dont_touch uint4  manage_l2cache;
+        dont_touch uint1  flush_bpred;
+        dont_touch uint2  csr_vxrm;
+        dont_touch uint64 csr_vtype;
+        dont_touch uint64 csr_vstart;
+        dont_touch struct csr_irq_ctrl_t irq_state;
+        dont_touch uint32 dcsr;
+        dont_touch uint64 dpc;
+        dont_touch uint12 event3;
+        dont_touch uint12 event4;
+        dont_touch uint12 event5;
+        dont_touch uint12 event6;
+        dont_touch struct mmu_csr_t mmu_csr_regs;
+        dont_touch uint1  flush_i0;
+        dont_touch uint1  flush_i1;
+        dont_touch uint1  match;
+        dont_touch uint1  typ;
+        dont_touch uint1  is_i1;
+        dont_touch uint3  act;
+
+        dont_touch bool   csr_dm_valid;
+        dont_touch xlen_t csr_dm_data;
+
+#ifdef OPTION_HAS_CHERI
+        dont_touch xlen_t ddc;
+        dont_touch xlen_t stcc;
+        dont_touch xlen_t stdc;
+        dont_touch xlen_t sscratchc;
+        dont_touch xlen_t sepcc;
+        dont_touch xlen_t dscratch0c;
+        dont_touch xlen_t dscratch1c;
+        dont_touch xlen_t dpcc;
+        dont_touch xlen_t mtcc;
+        dont_touch xlen_t mtdc;
+        dont_touch xlen_t mscratchc;
+        dont_touch xlen_t mepcc;
+#endif
+        
+        struct plc_csr_trap_dbg_t plc_updt_csr_ex3;
+        plc_updt_csr_ex3.dbg_ent_vld = 0;
+        plc_updt_csr_ex3.trap_ent_vld = 0;
+        plc_updt_csr_ex3.xret_vld = 0;
+        plc_updt_csr_ex3.cause = 0;
+        plc_updt_csr_ex3.tval = 0;
+        plc_updt_csr_ex3.xpc = 1000;
+        plc_updt_csr_ex3.mode = 0b011;
+
+        b = csr.get_test();
+
+        //DPU.FWD
+        csr.set_stall(0);
+        csr.set_flush(0);
+
+        ctrl.op = (uint4)1;
+        ctrl.opcode_csr = (uint12)0;
+        ctrl.opcode_rs1 = (uint5)0;
+        ctrl.opcode_rd  = (uint5)0;
+        csr.set_csr_instr(1, ctrl, 0);
+
+        csr.get_csr_rdata_out(rdata_vld, rdata_out);
+
+        //PLC
+        csr.set_operate_mode(1);
+        csr.set_updt_csr(plc_updt_csr_ex3);
+        csr.get_csr_excep(csr_excep, excep_arg);
+        csr.get_csr_inval_tlb(csr_inval_tlb_ex3);
+        csr.get_csr_refetch_flush(csr_refetch_ex3);
+        csr.get_act_csr_wr(csr_active_write);
+        csr.get_csr_plc_instr(plc_instr_ex2);
+
+        //HW direct read
+        csr.get_csr_frm(frm);
+        csr.get_dci_config(dis_late_alu, dis_all_dual_issue, dis_alu_agu_dual_issue, dis_mv_dual_issue, dis_alu_logic_dual_issue, dis_slot1, dis_spec_state_issue, dis_br_pred);
+        csr.get_csr_mdcachectrl(manage_dcache);
+        csr.get_csr_micachectrl(manage_icache);
+#if (OPTION_XLEN == 64)
+    #ifdef OPTION_HAS_L2CACHE
+        csr.get_csr_ml2cachectrl(manage_l2cache);
+    #endif
+#endif
+        csr.get_csr_sbpredctrl(flush_bpred);
+
+        csr.get_mmu_csr_intf(mmu_csr_regs);
+
+#if (OPTION_XLEN == 64)
+    #ifdef OPTION_EXTENSION_V
+        csr.get_csr_vxrm(csr_vxrm);
+        csr.get_csr_vtype(csr_vtype);
+        csr.get_csr_vstart(csr_vstart);
+    #endif
+#endif
+
+        csr.get_irq_ctrl(irq_state); //to PLC
+        csr.get_dbg_ctrl(dcsr, dpc); //to PLC
+
+        event3 = csr.get_hpmcounter_cfg3();
+        event4 = csr.get_hpmcounter_cfg4();
+        event5 = csr.get_hpmcounter_cfg5();
+        event6 = csr.get_hpmcounter_cfg6();
+
+
+        //HW direct write
+//        csr.set_clk(0);
+        csr.set_time(0);
+        csr.set_hpmcounter_incr(0);
+        csr.set_mhartid(0);
+        csr.set_mconfigptr(0);
+        csr.set_mip(0,0,0,0,0,0);
+        csr.set_csr_fflags(0,0);
+        csr.set_ifu_icache_status(0,0);
+        csr.set_dcu_dcache_status(0,0,0);
+        csr.set_wfi_status(0);
+        csr.set_instr_retr(0);
+
+        //Trigger match
+        //match_pc_0 = csr.dci_trigger_match_i0((uint64)0);
+        //match_pc_1 = csr.dci_trigger_match_i1((uint64)1);
+        //match_ls   = csr.dcu_trigger_match((uint64)2,0);
+        csr.set_pc_trigger_i0_ex1(0,0);
+        csr.set_pc_trigger_i1_ex1(0,0);
+        csr.set_ls_trigger_ex1(0,0,0,0);
+        csr.get_trigger_flush_i0_ex1(flush_i0);
+        csr.get_trigger_flush_i1_ex1(flush_i1);
+        csr.get_trigger_match_ex2(match, typ, is_i1, act);
+        csr.set_trigger_hit_ex3(0);
+
+        //DM
+        csr.set_dargs(0);
+        csr.get_darg_writes(csr_dm_valid, csr_dm_data);
+
+        //CHERI
+#ifdef OPTION_HAS_CHERI
+        csr.set_ccu_excep(0);
+        csr.get_scrs_addr(  ddc,
+                            stcc,
+                            stdc,
+                            sscratchc,
+                            sepcc,
+                            dscratch0c,
+                            dscratch1c,
+                            dpcc,
+                            mtcc,
+                            mtdc,
+                            mscratchc,
+                            mepcc
+        );
+#endif
+    }
+
+    /**
+     *  \brief  The default function of the main module starts execution of the next instruction.
+     *          It is activated every clock cycle.
+     */
+    automatic void clock_cycle()
+    {
+        stage pipe.ID
+        {
+            sl.S0.decode(dec, 0, 0);
+        }
+    }
+};

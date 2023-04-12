@@ -1,0 +1,1056 @@
+#include "shared_defines.hcodal"
+
+module csr_data_conv_t
+{
+//*************************
+//  read fcsr
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_fcsr(
+        struct fcsr_t fcsr)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint24)0 :: fcsr.frm :: fcsr.fflags;
+        return rdata;
+    }
+
+//*************************
+//  write fcsr
+//*************************
+    public struct fcsr_t struct_wdata_pack_fcsr(
+        uint_<{XLEN}> wdata)
+    {
+        struct fcsr_t fcsr;
+        fcsr.fflags           = wdata[4..0];
+        fcsr.frm              = wdata[7..5];
+        return fcsr;
+    }
+
+#if (OPTION_XLEN == 64)
+//*************************
+//  read vcsr
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_vcsr(
+        struct vcsr_t vcsr)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = vcsr.vxrm :: vcsr.vxsat;
+        return rdata;
+    }
+
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 64)
+//*************************
+//  write vcsr
+//*************************
+    public struct vcsr_t struct_wdata_pack_vcsr(
+        uint_<{XLEN}> wdata)
+    {
+        struct vcsr_t vcsr;
+        vcsr.vxsat            = wdata[0..0];
+        vcsr.vxrm             = wdata[2..1];
+        return vcsr;
+    }
+
+#endif //(OPTION_XLEN == 64)
+//*************************
+//  read stvec
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_stvec(
+        struct stvec_t stvec)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = stvec.base :: (uint3)0 :: stvec.mode;
+        return rdata;
+    }
+
+//*************************
+//  write stvec
+//*************************
+    public struct stvec_t struct_wdata_pack_stvec(
+        uint_<{XLEN}> wdata)
+    {
+        struct stvec_t stvec;
+#if (OPTION_XLEN == 64)
+        stvec.mode            = wdata[0..0];
+        stvec.base            = wdata[63..4];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        stvec.mode            = wdata[0..0];
+        stvec.base            = wdata[31..4];
+#endif //(OPTION_XLEN == 32)
+        return stvec;
+    }
+
+//*************************
+//  read scounteren
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_scounteren(
+        struct scounteren_t scounteren)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint25)0 :: scounteren.hpm6_3 :: scounteren.ir :: scounteren.tm :: scounteren.cy;
+        return rdata;
+    }
+
+//*************************
+//  write scounteren
+//*************************
+    public struct scounteren_t struct_wdata_pack_scounteren(
+        uint_<{XLEN}> wdata)
+    {
+        struct scounteren_t scounteren;
+        scounteren.cy         = wdata[0..0];
+        scounteren.tm         = wdata[1..1];
+        scounteren.ir         = wdata[2..2];
+        scounteren.hpm6_3     = wdata[6..3];
+        return scounteren;
+    }
+
+//*************************
+//  read sepc
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_sepc(
+        struct sepc_t sepc)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = sepc.epc :: (uint1)0;
+        return rdata;
+    }
+
+//*************************
+//  write sepc
+//*************************
+    public struct sepc_t struct_wdata_pack_sepc(
+        uint_<{XLEN}> wdata)
+    {
+        struct sepc_t sepc;
+#if (OPTION_XLEN == 64)
+        sepc.epc              = wdata[63..1];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        sepc.epc              = wdata[31..1];
+#endif //(OPTION_XLEN == 32)
+        return sepc;
+    }
+
+//*************************
+//  read scause
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_scause(
+        struct scause_t scause)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = scause.intr :: (uint_<{XLEN-7 })0 :: scause.expt;
+        return rdata;
+    }
+
+//*************************
+//  write scause
+//*************************
+    public struct scause_t struct_wdata_pack_scause(
+        uint_<{XLEN}> wdata)
+    {
+        struct scause_t scause;
+#if (OPTION_XLEN == 64)
+        scause.expt           = wdata[5..0];
+        scause.intr           = wdata[63..63];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        scause.expt           = wdata[5..0];
+        scause.intr           = wdata[31..31];
+#endif //(OPTION_XLEN == 32)
+        return scause;
+    }
+
+//*************************
+//  read satp
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_satp(
+        struct satp_t satp)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = satp.mode :: satp.asid :: satp.ppn;
+        return rdata;
+    }
+
+//*************************
+//  write satp
+//*************************
+    public struct satp_t struct_wdata_pack_satp(
+        uint_<{XLEN}> wdata)
+    {
+        struct satp_t satp;
+#if (OPTION_XLEN == 64)
+        satp.ppn              = wdata[43..0];
+        satp.asid             = wdata[59..44];
+        satp.mode             = wdata[63..60];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        satp.ppn              = wdata[21..0];
+        satp.asid             = wdata[30..22];
+        satp.mode             = wdata[31..31];
+#endif //(OPTION_XLEN == 32)
+        return satp;
+    }
+
+//*************************
+//  read mstatus
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mstatus(
+        struct mstatus_t mstatus)
+    {
+        uint_<{XLEN}> rdata;
+#if (OPTION_XLEN == 64)
+        rdata = mstatus.sd :: (uint25)0 :: mstatus.mbe :: mstatus.sbe :: mstatus.sxl :: mstatus.uxl :: (uint9)0 :: mstatus.tsr :: mstatus.tw :: mstatus.tvm :: mstatus.mxr :: mstatus.sum :: mstatus.mprv :: mstatus.xs :: mstatus.fs :: mstatus.mpp :: mstatus.vs :: mstatus.spp :: mstatus.mpie :: mstatus.ube :: mstatus.spie :: (uint1)0 :: mstatus.mie :: (uint1)0 :: mstatus.sie :: (uint1)0;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = mstatus.sd :: (uint8)0 :: mstatus.tsr :: mstatus.tw :: mstatus.tvm :: mstatus.mxr :: mstatus.sum :: mstatus.mprv :: mstatus.xs :: mstatus.fs :: mstatus.mpp :: mstatus.vs :: mstatus.spp :: mstatus.mpie :: mstatus.ube :: mstatus.spie :: (uint1)0 :: mstatus.mie :: (uint1)0 :: mstatus.sie :: (uint1)0;
+#endif //(OPTION_XLEN == 32)
+        return rdata;
+    }
+
+//*************************
+//  write mstatus
+//*************************
+    public struct mstatus_t struct_wdata_pack_mstatus(
+        uint_<{XLEN}> wdata)
+    {
+        struct mstatus_t mstatus;
+#if (OPTION_XLEN == 64)
+        mstatus.sie           = wdata[1..1];
+        mstatus.mie           = wdata[3..3];
+        mstatus.spie          = wdata[5..5];
+        mstatus.ube           = wdata[6..6];
+        mstatus.mpie          = wdata[7..7];
+        mstatus.spp           = wdata[8..8];
+        mstatus.vs            = wdata[10..9];
+        mstatus.mpp           = wdata[12..11];
+        mstatus.fs            = wdata[14..13];
+        mstatus.xs            = wdata[16..15];
+        mstatus.mprv          = wdata[17..17];
+        mstatus.sum           = wdata[18..18];
+        mstatus.mxr           = wdata[19..19];
+        mstatus.tvm           = wdata[20..20];
+        mstatus.tw            = wdata[21..21];
+        mstatus.tsr           = wdata[22..22];
+        mstatus.uxl           = wdata[33..32];
+        mstatus.sxl           = wdata[35..34];
+        mstatus.sbe           = wdata[36..36];
+        mstatus.mbe           = wdata[37..37];
+        mstatus.sd            = wdata[63..63];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        mstatus.sie           = wdata[1..1];
+        mstatus.mie           = wdata[3..3];
+        mstatus.spie          = wdata[5..5];
+        mstatus.ube           = wdata[6..6];
+        mstatus.mpie          = wdata[7..7];
+        mstatus.spp           = wdata[8..8];
+        mstatus.vs            = wdata[10..9];
+        mstatus.mpp           = wdata[12..11];
+        mstatus.fs            = wdata[14..13];
+        mstatus.xs            = wdata[16..15];
+        mstatus.mprv          = wdata[17..17];
+        mstatus.sum           = wdata[18..18];
+        mstatus.mxr           = wdata[19..19];
+        mstatus.tvm           = wdata[20..20];
+        mstatus.tw            = wdata[21..21];
+        mstatus.tsr           = wdata[22..22];
+        mstatus.sd            = wdata[31..31];
+#endif //(OPTION_XLEN == 32)
+        return mstatus;
+    }
+
+//*************************
+//  read misa
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_misa(
+        struct misa_t misa)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = misa.mxl :: (uint_<{XLEN-28 })0 :: misa.z :: misa.y :: misa.x :: misa.w :: misa.v :: misa.u :: misa.t :: misa.s :: misa.r :: misa.q :: misa.p :: misa.o :: misa.n :: misa.m :: misa.l :: misa.k :: misa.j :: misa.i :: misa.h :: misa.g :: misa.f :: misa.e :: misa.d :: misa.c :: misa.b :: misa.a;
+        return rdata;
+    }
+
+//*************************
+//  write misa
+//*************************
+    public struct misa_t struct_wdata_pack_misa(
+        uint_<{XLEN}> wdata)
+    {
+        struct misa_t misa;
+#if (OPTION_XLEN == 64)
+        misa.a                = wdata[0..0];
+        misa.b                = wdata[1..1];
+        misa.c                = wdata[2..2];
+        misa.d                = wdata[3..3];
+        misa.e                = wdata[4..4];
+        misa.f                = wdata[5..5];
+        misa.g                = wdata[6..6];
+        misa.h                = wdata[7..7];
+        misa.i                = wdata[8..8];
+        misa.j                = wdata[9..9];
+        misa.k                = wdata[10..10];
+        misa.l                = wdata[11..11];
+        misa.m                = wdata[12..12];
+        misa.n                = wdata[13..13];
+        misa.o                = wdata[14..14];
+        misa.p                = wdata[15..15];
+        misa.q                = wdata[16..16];
+        misa.r                = wdata[17..17];
+        misa.s                = wdata[18..18];
+        misa.t                = wdata[19..19];
+        misa.u                = wdata[20..20];
+        misa.v                = wdata[21..21];
+        misa.w                = wdata[22..22];
+        misa.x                = wdata[23..23];
+        misa.y                = wdata[24..24];
+        misa.z                = wdata[25..25];
+        misa.mxl              = wdata[63..62];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        misa.a                = wdata[0..0];
+        misa.b                = wdata[1..1];
+        misa.c                = wdata[2..2];
+        misa.d                = wdata[3..3];
+        misa.e                = wdata[4..4];
+        misa.f                = wdata[5..5];
+        misa.g                = wdata[6..6];
+        misa.h                = wdata[7..7];
+        misa.i                = wdata[8..8];
+        misa.j                = wdata[9..9];
+        misa.k                = wdata[10..10];
+        misa.l                = wdata[11..11];
+        misa.m                = wdata[12..12];
+        misa.n                = wdata[13..13];
+        misa.o                = wdata[14..14];
+        misa.p                = wdata[15..15];
+        misa.q                = wdata[16..16];
+        misa.r                = wdata[17..17];
+        misa.s                = wdata[18..18];
+        misa.t                = wdata[19..19];
+        misa.u                = wdata[20..20];
+        misa.v                = wdata[21..21];
+        misa.w                = wdata[22..22];
+        misa.x                = wdata[23..23];
+        misa.y                = wdata[24..24];
+        misa.z                = wdata[25..25];
+        misa.mxl              = wdata[31..30];
+#endif //(OPTION_XLEN == 32)
+        return misa;
+    }
+
+//*************************
+//  read medeleg
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_medeleg(
+        struct medeleg_t medeleg)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-16 })0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
+        return rdata;
+    }
+
+//*************************
+//  write medeleg
+//*************************
+    public struct medeleg_t struct_wdata_pack_medeleg(
+        uint_<{XLEN}> wdata)
+    {
+        struct medeleg_t medeleg;
+        medeleg.pc_mis_algn   = wdata[0..0];
+        medeleg.pc_fault      = wdata[1..1];
+        medeleg.illegal_inst  = wdata[2..2];
+        medeleg.breakpoint    = wdata[3..3];
+        medeleg.ld_mis_algn   = wdata[4..4];
+        medeleg.ld_fault      = wdata[5..5];
+        medeleg.st_mis_algn   = wdata[6..6];
+        medeleg.st_fault      = wdata[7..7];
+        medeleg.ecall_u       = wdata[8..8];
+        medeleg.ecall_s       = wdata[9..9];
+        medeleg.ecall_m       = wdata[11..11];
+        medeleg.inst_pg_fault = wdata[12..12];
+        medeleg.ld_pg_fault   = wdata[13..13];
+        medeleg.st_pg_fault   = wdata[15..15];
+        return medeleg;
+    }
+
+//*************************
+//  read mideleg
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mideleg(
+        struct mideleg_t mideleg)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-12 })0 :: mideleg.meid :: (uint1)0 :: mideleg.seid :: (uint1)0 :: mideleg.mtid :: (uint1)0 :: mideleg.stid :: (uint1)0 :: mideleg.msid :: (uint1)0 :: mideleg.ssid :: (uint1)0;
+        return rdata;
+    }
+
+//*************************
+//  write mideleg
+//*************************
+    public struct mideleg_t struct_wdata_pack_mideleg(
+        uint_<{XLEN}> wdata)
+    {
+        struct mideleg_t mideleg;
+        mideleg.ssid          = wdata[1..1];
+        mideleg.msid          = wdata[3..3];
+        mideleg.stid          = wdata[5..5];
+        mideleg.mtid          = wdata[7..7];
+        mideleg.seid          = wdata[9..9];
+        mideleg.meid          = wdata[11..11];
+        return mideleg;
+    }
+
+//*************************
+//  read mie
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mie(
+        struct mie_t mie)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-12 })0 :: mie.meie :: (uint1)0 :: mie.seie :: (uint1)0 :: mie.mtie :: (uint1)0 :: mie.stie :: (uint1)0 :: mie.msie :: (uint1)0 :: mie.ssie :: (uint1)0;
+        return rdata;
+    }
+
+//*************************
+//  write mie
+//*************************
+    public struct mie_t struct_wdata_pack_mie(
+        uint_<{XLEN}> wdata)
+    {
+        struct mie_t mie;
+        mie.ssie              = wdata[1..1];
+        mie.msie              = wdata[3..3];
+        mie.stie              = wdata[5..5];
+        mie.mtie              = wdata[7..7];
+        mie.seie              = wdata[9..9];
+        mie.meie              = wdata[11..11];
+        return mie;
+    }
+
+//*************************
+//  read mtvec
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mtvec(
+        struct mtvec_t mtvec)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = mtvec.base :: (uint3)0 :: mtvec.mode;
+        return rdata;
+    }
+
+//*************************
+//  write mtvec
+//*************************
+    public struct mtvec_t struct_wdata_pack_mtvec(
+        uint_<{XLEN}> wdata)
+    {
+        struct mtvec_t mtvec;
+#if (OPTION_XLEN == 64)
+        mtvec.mode            = wdata[0..0];
+        mtvec.base            = wdata[63..4];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        mtvec.mode            = wdata[0..0];
+        mtvec.base            = wdata[31..4];
+#endif //(OPTION_XLEN == 32)
+        return mtvec;
+    }
+
+//*************************
+//  read mcounteren
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mcounteren(
+        struct mcounteren_t mcounteren)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint25)0 :: mcounteren.hpm6_3 :: mcounteren.ir :: mcounteren.tm :: mcounteren.cy;
+        return rdata;
+    }
+
+//*************************
+//  write mcounteren
+//*************************
+    public struct mcounteren_t struct_wdata_pack_mcounteren(
+        uint_<{XLEN}> wdata)
+    {
+        struct mcounteren_t mcounteren;
+        mcounteren.cy         = wdata[0..0];
+        mcounteren.tm         = wdata[1..1];
+        mcounteren.ir         = wdata[2..2];
+        mcounteren.hpm6_3     = wdata[6..3];
+        return mcounteren;
+    }
+
+#if (OPTION_XLEN == 32)
+//*************************
+//  read mstatush
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mstatush(
+        struct mstatush_t mstatush)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint26)0 :: mstatush.mbe :: mstatush.sbe :: (uint4)0;
+        return rdata;
+    }
+
+#endif //(OPTION_XLEN == 32)
+#if (OPTION_XLEN == 32)
+//*************************
+//  write mstatush
+//*************************
+    public struct mstatush_t struct_wdata_pack_mstatush(
+        uint_<{XLEN}> wdata)
+    {
+        struct mstatush_t mstatush;
+        mstatush.sbe          = wdata[4..4];
+        mstatush.mbe          = wdata[5..5];
+        return mstatush;
+    }
+
+#endif //(OPTION_XLEN == 32)
+#if (OPTION_XLEN == 32)
+//*************************
+//  read menvcfgh
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_menvcfgh(
+        struct menvcfgh_t menvcfgh)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = menvcfgh.stce :: menvcfgh.pbmte :: (uint30)0;
+        return rdata;
+    }
+
+#endif //(OPTION_XLEN == 32)
+#if (OPTION_XLEN == 32)
+//*************************
+//  write menvcfgh
+//*************************
+    public struct menvcfgh_t struct_wdata_pack_menvcfgh(
+        uint_<{XLEN}> wdata)
+    {
+        struct menvcfgh_t menvcfgh;
+        menvcfgh.pbmte        = wdata[30..30];
+        menvcfgh.stce         = wdata[31..31];
+        return menvcfgh;
+    }
+
+#endif //(OPTION_XLEN == 32)
+//*************************
+//  read mcountinhibit
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mcountinhibit(
+        struct mcountinhibit_t mcountinhibit)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint25)0 :: mcountinhibit.hpm6_3 :: mcountinhibit.ir :: (uint1)0 :: mcountinhibit.cy;
+        return rdata;
+    }
+
+//*************************
+//  write mcountinhibit
+//*************************
+    public struct mcountinhibit_t struct_wdata_pack_mcountinhibit(
+        uint_<{XLEN}> wdata)
+    {
+        struct mcountinhibit_t mcountinhibit;
+        mcountinhibit.cy      = wdata[0..0];
+        mcountinhibit.ir      = wdata[2..2];
+        mcountinhibit.hpm6_3  = wdata[6..3];
+        return mcountinhibit;
+    }
+
+//*************************
+//  read mhpmevent3
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mhpmevent3(
+        struct mhpmevent3_t mhpmevent3)
+    {
+        uint_<{XLEN}> rdata;
+#if (OPTION_XLEN == 64)
+        rdata = (uint52)0 :: mhpmevent3.evt;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint20)0 :: mhpmevent3.evt;
+#endif //(OPTION_XLEN == 32)
+        return rdata;
+    }
+
+//*************************
+//  write mhpmevent3
+//*************************
+    public struct mhpmevent3_t struct_wdata_pack_mhpmevent3(
+        uint_<{XLEN}> wdata)
+    {
+        struct mhpmevent3_t mhpmevent3;
+        mhpmevent3.evt        = wdata[11..0];
+        return mhpmevent3;
+    }
+
+//*************************
+//  read mhpmevent4
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mhpmevent4(
+        struct mhpmevent4_t mhpmevent4)
+    {
+        uint_<{XLEN}> rdata;
+#if (OPTION_XLEN == 64)
+        rdata = (uint52)0 :: mhpmevent4.evt;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint20)0 :: mhpmevent4.evt;
+#endif //(OPTION_XLEN == 32)
+        return rdata;
+    }
+
+//*************************
+//  write mhpmevent4
+//*************************
+    public struct mhpmevent4_t struct_wdata_pack_mhpmevent4(
+        uint_<{XLEN}> wdata)
+    {
+        struct mhpmevent4_t mhpmevent4;
+        mhpmevent4.evt        = wdata[11..0];
+        return mhpmevent4;
+    }
+
+//*************************
+//  read mhpmevent5
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mhpmevent5(
+        struct mhpmevent5_t mhpmevent5)
+    {
+        uint_<{XLEN}> rdata;
+#if (OPTION_XLEN == 64)
+        rdata = (uint52)0 :: mhpmevent5.evt;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint20)0 :: mhpmevent5.evt;
+#endif //(OPTION_XLEN == 32)
+        return rdata;
+    }
+
+//*************************
+//  write mhpmevent5
+//*************************
+    public struct mhpmevent5_t struct_wdata_pack_mhpmevent5(
+        uint_<{XLEN}> wdata)
+    {
+        struct mhpmevent5_t mhpmevent5;
+        mhpmevent5.evt        = wdata[11..0];
+        return mhpmevent5;
+    }
+
+//*************************
+//  read mhpmevent6
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mhpmevent6(
+        struct mhpmevent6_t mhpmevent6)
+    {
+        uint_<{XLEN}> rdata;
+#if (OPTION_XLEN == 64)
+        rdata = (uint52)0 :: mhpmevent6.evt;
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        rdata = (uint20)0 :: mhpmevent6.evt;
+#endif //(OPTION_XLEN == 32)
+        return rdata;
+    }
+
+//*************************
+//  write mhpmevent6
+//*************************
+    public struct mhpmevent6_t struct_wdata_pack_mhpmevent6(
+        uint_<{XLEN}> wdata)
+    {
+        struct mhpmevent6_t mhpmevent6;
+        mhpmevent6.evt        = wdata[11..0];
+        return mhpmevent6;
+    }
+
+//*************************
+//  read mepc
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mepc(
+        struct mepc_t mepc)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = mepc.epc :: (uint1)0;
+        return rdata;
+    }
+
+//*************************
+//  write mepc
+//*************************
+    public struct mepc_t struct_wdata_pack_mepc(
+        uint_<{XLEN}> wdata)
+    {
+        struct mepc_t mepc;
+#if (OPTION_XLEN == 64)
+        mepc.epc              = wdata[63..1];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        mepc.epc              = wdata[31..1];
+#endif //(OPTION_XLEN == 32)
+        return mepc;
+    }
+
+//*************************
+//  read mcause
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mcause(
+        struct mcause_t mcause)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = mcause.intr :: (uint_<{XLEN-7 })0 :: mcause.expt;
+        return rdata;
+    }
+
+//*************************
+//  write mcause
+//*************************
+    public struct mcause_t struct_wdata_pack_mcause(
+        uint_<{XLEN}> wdata)
+    {
+        struct mcause_t mcause;
+#if (OPTION_XLEN == 64)
+        mcause.expt           = wdata[5..0];
+        mcause.intr           = wdata[63..63];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        mcause.expt           = wdata[5..0];
+        mcause.intr           = wdata[31..31];
+#endif //(OPTION_XLEN == 32)
+        return mcause;
+    }
+
+//*************************
+//  read mip
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mip(
+        struct mip_t mip)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-12 })0 :: mip.meip :: (uint1)0 :: mip.seip :: (uint1)0 :: mip.mtip :: (uint1)0 :: mip.stip :: (uint1)0 :: mip.msip :: (uint1)0 :: mip.ssip :: (uint1)0;
+        return rdata;
+    }
+
+//*************************
+//  write mip
+//*************************
+    public struct mip_t struct_wdata_pack_mip(
+        uint_<{XLEN}> wdata)
+    {
+        struct mip_t mip;
+        mip.ssip              = wdata[1..1];
+        mip.msip              = wdata[3..3];
+        mip.stip              = wdata[5..5];
+        mip.mtip              = wdata[7..7];
+        mip.seip              = wdata[9..9];
+        mip.meip              = wdata[11..11];
+        return mip;
+    }
+
+//*************************
+//  read sbpredctrl
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_sbpredctrl(
+        struct sbpredctrl_t sbpredctrl)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-1 })0 :: sbpredctrl.flush_bpred;
+        return rdata;
+    }
+
+//*************************
+//  write sbpredctrl
+//*************************
+    public struct sbpredctrl_t struct_wdata_pack_sbpredctrl(
+        uint_<{XLEN}> wdata)
+    {
+        struct sbpredctrl_t sbpredctrl;
+        sbpredctrl.flush_bpred= wdata[0..0];
+        return sbpredctrl;
+    }
+
+//*************************
+//  read tselect
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_tselect(
+        struct tselect_t tselect)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-2 })0 :: tselect.idx;
+        return rdata;
+    }
+
+//*************************
+//  write tselect
+//*************************
+    public struct tselect_t struct_wdata_pack_tselect(
+        uint_<{XLEN}> wdata)
+    {
+        struct tselect_t tselect;
+        tselect.idx           = wdata[1..0];
+        return tselect;
+    }
+
+//*************************
+//  read dcsr
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_dcsr(
+        struct dcsr_t dcsr)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = dcsr.debugver :: (uint10)0 :: dcsr.ebreakvs :: dcsr.ebreakvu :: dcsr.ebreakm :: (uint1)0 :: dcsr.ebreaks :: dcsr.ebreaku :: dcsr.stepie :: dcsr.stopcount :: dcsr.stoptime :: dcsr.cause :: dcsr.v :: dcsr.mprven :: dcsr.nmip :: dcsr.step :: dcsr.prv;
+        return rdata;
+    }
+
+//*************************
+//  write dcsr
+//*************************
+    public struct dcsr_t struct_wdata_pack_dcsr(
+        uint_<{XLEN}> wdata)
+    {
+        struct dcsr_t dcsr;
+        dcsr.prv              = wdata[1..0];
+        dcsr.step             = wdata[2..2];
+        dcsr.nmip             = wdata[3..3];
+        dcsr.mprven           = wdata[4..4];
+        dcsr.v                = wdata[5..5];
+        dcsr.cause            = wdata[8..6];
+        dcsr.stoptime         = wdata[9..9];
+        dcsr.stopcount        = wdata[10..10];
+        dcsr.stepie           = wdata[11..11];
+        dcsr.ebreaku          = wdata[12..12];
+        dcsr.ebreaks          = wdata[13..13];
+        dcsr.ebreakm          = wdata[15..15];
+        dcsr.ebreakvu         = wdata[16..16];
+        dcsr.ebreakvs         = wdata[17..17];
+        dcsr.debugver         = wdata[31..28];
+        return dcsr;
+    }
+
+//*************************
+//  read dpc
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_dpc(
+        struct dpc_t dpc)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = dpc.dpc :: (uint1)0;
+        return rdata;
+    }
+
+//*************************
+//  write dpc
+//*************************
+    public struct dpc_t struct_wdata_pack_dpc(
+        uint_<{XLEN}> wdata)
+    {
+        struct dpc_t dpc;
+#if (OPTION_XLEN == 64)
+        dpc.dpc               = wdata[63..1];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        dpc.dpc               = wdata[31..1];
+#endif //(OPTION_XLEN == 32)
+        return dpc;
+    }
+
+//*************************
+//  read mcfgctrl
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mcfgctrl(
+        struct mcfgctrl_t mcfgctrl)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-17 })0 :: mcfgctrl.dis_large_tlb_page :: (uint8)0 :: mcfgctrl.dis_br_pred :: mcfgctrl.dis_spec_state_issue :: mcfgctrl.dis_slot1 :: mcfgctrl.dis_alu_logic_dual_issue :: mcfgctrl.dis_mv_dual_issue :: mcfgctrl.dis_alu_agu_dual_issue :: mcfgctrl.dis_all_dual_issue :: mcfgctrl.dis_late_alu;
+        return rdata;
+    }
+
+//*************************
+//  write mcfgctrl
+//*************************
+    public struct mcfgctrl_t struct_wdata_pack_mcfgctrl(
+        uint_<{XLEN}> wdata)
+    {
+        struct mcfgctrl_t mcfgctrl;
+        mcfgctrl.dis_late_alu = wdata[0..0];
+        mcfgctrl.dis_all_dual_issue= wdata[1..1];
+        mcfgctrl.dis_alu_agu_dual_issue= wdata[2..2];
+        mcfgctrl.dis_mv_dual_issue= wdata[3..3];
+        mcfgctrl.dis_alu_logic_dual_issue= wdata[4..4];
+        mcfgctrl.dis_slot1    = wdata[5..5];
+        mcfgctrl.dis_spec_state_issue= wdata[6..6];
+        mcfgctrl.dis_br_pred  = wdata[7..7];
+        mcfgctrl.dis_large_tlb_page= wdata[16..16];
+        return mcfgctrl;
+    }
+
+//*************************
+//  read mcachestatus
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mcachestatus(
+        struct mcachestatus_t mcachestatus)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-25 })0 :: mcachestatus.wfi_stop_mode :: (uint7)0 :: mcachestatus.l2cache_disabled :: (uint6)0 :: mcachestatus.dcache_pref_disabled :: mcachestatus.dcache_disabled :: (uint6)0 :: mcachestatus.icache_pref_disabled :: mcachestatus.icache_disabled;
+        return rdata;
+    }
+
+//*************************
+//  write mcachestatus
+//*************************
+    public struct mcachestatus_t struct_wdata_pack_mcachestatus(
+        uint_<{XLEN}> wdata)
+    {
+        struct mcachestatus_t mcachestatus;
+        mcachestatus.icache_disabled= wdata[0..0];
+        mcachestatus.icache_pref_disabled= wdata[1..1];
+        mcachestatus.dcache_disabled= wdata[8..8];
+        mcachestatus.dcache_pref_disabled= wdata[9..9];
+        mcachestatus.l2cache_disabled= wdata[16..16];
+        mcachestatus.wfi_stop_mode= wdata[24..24];
+        return mcachestatus;
+    }
+
+//*************************
+//  read mdcachectrl
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_mdcachectrl(
+        struct mdcachectrl_t mdcachectrl)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-4 })0 :: mdcachectrl.manage_dcache;
+        return rdata;
+    }
+
+//*************************
+//  write mdcachectrl
+//*************************
+    public struct mdcachectrl_t struct_wdata_pack_mdcachectrl(
+        uint_<{XLEN}> wdata)
+    {
+        struct mdcachectrl_t mdcachectrl;
+        mdcachectrl.manage_dcache= wdata[3..0];
+        return mdcachectrl;
+    }
+
+//*************************
+//  read micachectrl
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_micachectrl(
+        struct micachectrl_t micachectrl)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint_<{XLEN-3 })0 :: micachectrl.manage_icache;
+        return rdata;
+    }
+
+//*************************
+//  write micachectrl
+//*************************
+    public struct micachectrl_t struct_wdata_pack_micachectrl(
+        uint_<{XLEN}> wdata)
+    {
+        struct micachectrl_t micachectrl;
+        micachectrl.manage_icache= wdata[2..0];
+        return micachectrl;
+    }
+
+#if (OPTION_XLEN == 64)
+//*************************
+//  read ml2cachectrl
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_ml2cachectrl(
+        struct ml2cachectrl_t ml2cachectrl)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = (uint60)0 :: ml2cachectrl.manage_l2cache;
+        return rdata;
+    }
+
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 64)
+//*************************
+//  write ml2cachectrl
+//*************************
+    public struct ml2cachectrl_t struct_wdata_pack_ml2cachectrl(
+        uint_<{XLEN}> wdata)
+    {
+        struct ml2cachectrl_t ml2cachectrl;
+        ml2cachectrl.manage_l2cache= wdata[3..0];
+        return ml2cachectrl;
+    }
+
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 64)
+//*************************
+//  read vtype
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_vtype(
+        struct vtype_t vtype)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = vtype.vill :: (uint55)0 :: vtype.vma :: vtype.vta :: vtype.vsew :: vtype.vlmul;
+        return rdata;
+    }
+
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 64)
+//*************************
+//  write vtype
+//*************************
+    public struct vtype_t struct_wdata_pack_vtype(
+        uint_<{XLEN}> wdata)
+    {
+        struct vtype_t vtype;
+        vtype.vlmul           = wdata[2..0];
+        vtype.vsew            = wdata[5..3];
+        vtype.vta             = wdata[6..6];
+        vtype.vma             = wdata[7..7];
+        vtype.vill            = wdata[63..63];
+        return vtype;
+    }
+
+#endif //(OPTION_XLEN == 64)
+//*************************
+//  read marchid
+//*************************
+    public always uint_<{XLEN}> struct_rdata_unpack_marchid(
+        struct marchid_t marchid)
+    {
+        uint_<{XLEN}> rdata;
+        rdata = marchid.preset :: (uint_<{XLEN-29 })0 :: marchid.vector :: (uint4)0 :: marchid.cheri :: marchid.fusa :: marchid.archt :: (uint4)0 :: marchid.obilix;
+        return rdata;
+    }
+
+//*************************
+//  write marchid
+//*************************
+    public struct marchid_t struct_wdata_pack_marchid(
+        uint_<{XLEN}> wdata)
+    {
+        struct marchid_t marchid;
+#if (OPTION_XLEN == 64)
+        marchid.obilix        = wdata[3..0];
+        marchid.archt         = wdata[11..8];
+        marchid.fusa          = wdata[15..12];
+        marchid.cheri         = wdata[19..16];
+        marchid.vector        = wdata[27..24];
+        marchid.preset        = wdata[63..63];
+#endif //(OPTION_XLEN == 64)
+#if (OPTION_XLEN == 32)
+        marchid.obilix        = wdata[3..0];
+        marchid.archt         = wdata[11..8];
+        marchid.fusa          = wdata[15..12];
+        marchid.cheri         = wdata[19..16];
+        marchid.vector        = wdata[27..24];
+        marchid.preset        = wdata[31..31];
+#endif //(OPTION_XLEN == 32)
+        return marchid;
+    }
+
+}; //endmodule csr_data_conv_t

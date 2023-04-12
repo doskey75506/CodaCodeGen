@@ -5,7 +5,13 @@ import re
 import pdb
 #pdb.set_trace()
 
-from gen_csr_func import *
+from gen_func import *
+
+def gen_def_addr(name, addr):
+  def_str = f"#define CSR_{name.upper()}"
+  def_str +=' '*(40-len(def_str))
+  def_str +=f"{addr}\n"
+  return def_str
 
 #################################### MAIN ####################################
 if __name__ == "__main__":
@@ -33,9 +39,9 @@ if __name__ == "__main__":
               if rowx_name.find('<') != -1:#Name contains '<': generate a list of names
                 def_name_list, def_addr_list = parse_name(rowx_name, rowx_addr)
                 for j in range(0, len(def_name_list)):
-                  codal_def.write(gen_define(def_name_list[j], def_addr_list[j]))
+                  codal_def.write(gen_def_addr(def_name_list[j], def_addr_list[j]))
 
               else:
-                codal_def.write(gen_define(rowx_name, rowx_addr))
+                codal_def.write(gen_def_addr(rowx_name, rowx_addr))
             
 ##############################################################################
