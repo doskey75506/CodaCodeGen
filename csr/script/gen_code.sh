@@ -27,7 +27,7 @@ echo "Code generated for ./model/include/csr_define_addr.hcodal"
 #./script/gen_define_mask.py $CSR_LIST $OUT_FILE_DEF_MASK
 #echo "Code generated for ./model/include/csr_define_mask.hcodal"
 
-./script/gen_struct_reg.py $CSR_LIST $OUT_FILE_STRUCT_REG $OUT_FILE_STRUCT_CONV
+./script/gen_struct_reg.py $CSR_LIST $OUT_FILE_STRUCT_REG$OUT_FILE_STRUCT_REG $OUT_FILE_STRUCT_CONV
 #./script/gen_struct_reg.py $CSR_LIST $OUT_FILE_STRUCT_REG
 echo "Code generated for ./model/include/csr_struct_reg.codal"
 echo "Code generated for ./model/modules/csr_data_conv.codal"

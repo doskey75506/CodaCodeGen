@@ -1253,6 +1253,27 @@ def longest_common_leader(str1, str2):    # 示例字符串
     return common_header, tail1, tail2
 
 
+def gen_strings_to_append(rowx_name, header, row, first_item, gen64, gen32):
+    if gen64:
+        rowx_struct64, _, _, _, _, _, _, rowx_struct_rd64, rowx_struct_wr64, _ = \
+            gen_struct(rowx_name, header, row, first_item, True)
+    else:
+        rowx_struct64 = ""
+        rowx_struct_rd64 = ""
+        rowx_struct_wr64 = ""
+    if gen32:
+        rowx_struct32, _, _, _, _, _, _, rowx_struct_rd32, rowx_struct_wr32, _ = \
+            gen_struct(rowx_name, header, row, first_item, False)
+    else:
+        rowx_struct32 = ""
+        rowx_struct_rd32 = ""
+        rowx_struct_wr32 = ""
+
+    strct_comm, struct64, struct32 = longest_common_leader(rowx_struct64, rowx_struct32)
+    unpack_comm, unpack64, unpack32 = longest_common_leader(rowx_struct_rd64, rowx_struct_rd32)
+    return strct_comm, struct64, struct32, unpack_comm, unpack64, unpack32
+
+
 if __name__ == '__main__':
     # Test longest_common_leader
 
