@@ -1207,7 +1207,7 @@ def longest_common_leader(str1, str2):    # 示例字符串
     common_header = ''
     for i in range(idx):
         if lineList1[i] == lineList2[i]:
-            common_header += lineList1[i]
+            common_header += lineList1[i] + '\n'
         else:
             # Find a line that not equal:
             #   if the only unequal part of these two lines are digits and the value has a different of 32,
@@ -1243,7 +1243,7 @@ def longest_common_leader(str1, str2):    # 示例字符串
                         still_common = False
                         break
             if  still_common:
-                common_header += common_line
+                common_header += common_line + '\n'
             else:
                 idx = i
                 break
