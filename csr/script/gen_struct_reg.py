@@ -58,32 +58,19 @@ if __name__ == "__main__":
 
                         struct_name = struct_name_list[k]
 
+                        #clear before comparison
+                        rowx_struct64 = ''
+                        rowx_struct32 = ''
+                        rowx_struct_rd64 = ''
+                        rowx_struct_wr64 = ''
+                        rowx_struct_rd32 = ''
+                        rowx_struct_wr32 = ''
+
                         if rowx_rv64_valid:
-                            rowx_struct64, _, _, _, _, _, _, rowx_struct_rd, rowx_struct_wr, _ = gen_struct(struct_name_list[k], header, row, first_item, True)
-                            rowx_struct_rd64 = rowx_struct_rd
-                            rowx_struct_wr64 = rowx_struct_wr
-                            if not rowx_rv32_valid:
-                                rowx_struct32 = ''
-                                rowx_struct_rd32 = ''
-                                rowx_struct_rd32 = ''
+                            rowx_struct64, _, _, _, _, _, _, rowx_struct_rd64, rowx_struct_wr64, _ = gen_struct(struct_name_list[k], header, row, first_item, True)
                         
                         if rowx_rv32_valid:
-                            rowx_struct32, _, _, _, _, _, _, rowx_struct_rd, rowx_struct_wr, _ = gen_struct(struct_name_list[k], header, row, first_item, False)
-                            rowx_struct_rd32 = rowx_struct_rd
-                            rowx_struct_wr32 = rowx_struct_wr
-                            if not rowx_rv64_valid:
-                                rowx_struct64 = ''
-                                rowx_struct_rd64 = ''
-                                rowx_struct_wr64 = ''
-
-                        if not rowx_rv64_valid and not rowx_rv32_valid:
-                            #clear before comparison
-                            rowx_struct64 = ''
-                            rowx_struct32 = ''
-                            rowx_struct_rd64 = ''
-                            rowx_struct_wr64 = ''
-                            rowx_struct_rd32 = ''
-                            rowx_struct_wr32 = ''
+                            rowx_struct32, _, _, _, _, _, _, rowx_struct_rd32, rowx_struct_wr32, _ = gen_struct(struct_name_list[k], header, row, first_item, False)
 
                         #compare rowx_struct64 and rowx_struct32
                         if (rowx_struct64 == rowx_struct32):
@@ -96,14 +83,15 @@ if __name__ == "__main__":
                             final_struct32 += rowx_struct32
                         
                         #compare rowx_struct_rd64 and rowx_struct_rd32
-                        if (rowx_struct_rd64 == rowx_struct_rd32):
-                            final_unpack_comm = rowx_struct_rd64
-                            final_unpack64 = ''
-                            final_unpack32 = ''
-                        else:
-                            final_unpack_comm = ''
-                            final_unpack64 = rowx_struct_rd64
-                            final_unpack32 = rowx_struct_rd32
+                        # if (rowx_struct_rd64 == rowx_struct_rd32):
+                        #     final_unpack_comm = rowx_struct_rd64
+                        #     final_unpack64 = ''
+                        #     final_unpack32 = ''
+                        # else:
+                        #     final_unpack_comm = ''
+                        #     final_unpack64 = rowx_struct_rd64
+                        #     final_unpack32 = rowx_struct_rd32
+                        final_unpack_comm, final_unpack64, final_unpack32 = longest_common_leader(rowx_struct_rd64, rowx_struct_rd32)
                         
                         if rowx_rv64_valid and rowx_rv32_valid:
                             final_unpack_middle = unpack_struct_to_xlen_middle(struct_name, final_unpack_comm)
@@ -123,14 +111,15 @@ if __name__ == "__main__":
 
 
                         #compare rowx_struct_wr64 and rowx_struct_wr32
-                        if (rowx_struct_wr64 == rowx_struct_wr32):
-                            final_pack_comm = rowx_struct_wr64
-                            final_pack64 = ''
-                            final_pack32 = ''
-                        else:
-                            final_pack_comm = ''
-                            final_pack64 = rowx_struct_wr64
-                            final_pack32 = rowx_struct_wr32
+                        # if (rowx_struct_wr64 == rowx_struct_wr32):
+                        #     final_pack_comm = rowx_struct_wr64
+                        #     final_pack64 = ''
+                        #     final_pack32 = ''
+                        # else:
+                        #     final_pack_comm = ''
+                        #     final_pack64 = rowx_struct_wr64
+                        #     final_pack32 = rowx_struct_wr32
+                        final_pack_comm, final_pack64, final_pack32 = longest_common_leader(rowx_struct_wr64, rowx_struct_wr32)
                         
                         if rowx_rv64_valid and rowx_rv32_valid:
                             final_pack_middle = pack_xlen_to_struct_middle(struct_name, final_pack_comm)
@@ -152,13 +141,40 @@ if __name__ == "__main__":
                 else:#Name doesn't contain '<'
                     struct_name = rowx_name
 
-                    strct_comm, struct64, struct32, final_unpack_comm, final_unpack64, final_unpack32 = \
-                        gen_strings_to_append(rowx_name, header, row, first_item, rowx_rv64_valid, rowx_rv32_valid)
+                    #clear before comparison
+                    rowx_struct64 = ''
+                    rowx_struct32 = ''
+                    rowx_struct_rd64 = ''
+                    rowx_struct_wr64 = ''
+                    rowx_struct_rd32 = ''
+                    rowx_struct_wr32 = ''
 
-                    final_struct_comm += strct_comm
-                    final_struct64 += struct64
-                    final_struct32 += struct32
+                    if rowx_rv64_valid:
+                        rowx_struct64, _, _, _, _, _, _, rowx_struct_rd64, rowx_struct_wr64, _ = gen_struct(rowx_name, header, row, first_item, True)
+                    
+                    if rowx_rv32_valid:
+                        rowx_struct32, _, _, _, _, _, _, rowx_struct_rd32, rowx_struct_wr32, _ = gen_struct(rowx_name, header, row, first_item, False)
 
+                    #compare rowx_struct64 and rowx_struct32
+                    if (rowx_struct64 == rowx_struct32):
+                        final_struct_comm += rowx_struct64
+                        final_struct64 += ''
+                        final_struct32 += ''
+                    else:
+                        final_struct_comm += ''
+                        final_struct64 += rowx_struct64
+                        final_struct32 += rowx_struct32
+
+                    #compare rowx_struct_rd64 and rowx_struct_rd32
+                    # if (rowx_struct_rd64 == rowx_struct_rd32):
+                    #     final_unpack_comm = rowx_struct_rd64
+                    #     final_unpack64 = ''
+                    #     final_unpack32 = ''
+                    # else:
+                    #     final_unpack_comm = ''
+                    #     final_unpack64 = rowx_struct_rd64
+                    #     final_unpack32 = rowx_struct_rd32
+                    final_unpack_comm, final_unpack64, final_unpack32 = longest_common_leader(rowx_struct_rd64, rowx_struct_rd32)
 
                     if rowx_rv64_valid and rowx_rv32_valid:
                         final_unpack_middle = unpack_struct_to_xlen_middle(struct_name, final_unpack_comm)
@@ -177,14 +193,15 @@ if __name__ == "__main__":
                         codal_struct_conv.write(final_unpack)
 
                     #compare rowx_struct_wr64 and rowx_struct_wr32
-                    if (rowx_struct_wr64 == rowx_struct_wr32):
-                        final_pack_comm = rowx_struct_wr64
-                        final_pack64 = ''
-                        final_pack32 = ''
-                    else:
-                        final_pack_comm = ''
-                        final_pack64 = rowx_struct_wr64
-                        final_pack32 = rowx_struct_wr32
+                    # if (rowx_struct_wr64 == rowx_struct_wr32):
+                    #     final_pack_comm = rowx_struct_wr64
+                    #     final_pack64 = ''
+                    #     final_pack32 = ''
+                    # else:
+                    #     final_pack_comm = ''
+                    #     final_pack64 = rowx_struct_wr64
+                    #     final_pack32 = rowx_struct_wr32
+                    final_pack_comm, final_pack64, final_pack32 = longest_common_leader(rowx_struct_wr64, rowx_struct_wr32)
                     
                     if rowx_rv64_valid and rowx_rv32_valid:
                         final_pack_middle = pack_xlen_to_struct_middle(struct_name, final_pack_comm)

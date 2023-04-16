@@ -13,11 +13,10 @@ s_rdata_is_struct_in_pattern = False
 gen_struct_conv = True
 
 #--------------------------------------------------------------------------------
-# Register Read/Write Patterns
+# Register Read/Write Patterns (Solution 1)
 #--------------------------------------------------------------------------------
 # Identify pattern
 def pattern_id(reg_name, is_struct, is_ro, is_hw, is_roz, rdata_en):
-    #print(reg_name, ', is_struct:', is_struct, ', is_ro:', is_ro, ', is_hw:', is_hw, ', is_roz:', is_roz, ', rdata_en: ', rdata_en)
     if not is_roz: #is_roz belongs to is_ro
         if not is_struct: #xlen-bit
             if not is_ro and not is_hw:
@@ -54,213 +53,471 @@ def pattern_id(reg_name, is_struct, is_ro, is_hw, is_roz, rdata_en):
     
     return ''
 
+# # Pattern 1: SRW, XLEN
+# def pattern1(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 1: SRW, XLEN\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = s_swdata;\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 1T: SRW, XLEN, tdata2
+# def pattern1t(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 1T: SRW, XLEN, tdata2\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name}[r_tselect.idx];\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name}[r_tselect.idx];\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name}[r_tselect.idx] = s_swdata;\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 1E: SRW/RD-EN, XLEN
+# def pattern1e(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 1E: SRW + RD-EN/ROZ, XLEN\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#         read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
+#         read_str += ' '*12 + f's_rdata.{reg_name} = r_{reg_name};\n'
+#         read_str += ' '*8  + 'else\n'
+#         read_str += ' '*12 + f's_rdata.{reg_name} = 0;\n'
+#     else:
+#         read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
+#         read_str += ' '*12 + f's_rdata_{reg_name} = r_{reg_name};\n'
+#         read_str += ' '*8  + 'else\n'
+#         read_str += ' '*12 + f's_rdata_{reg_name} = 0;\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = s_swdata;\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 1S: SRW, STRUCT
+# def pattern1s(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 1S: SRW, STRUCT\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_swdata);\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 1ES: SRW/RD-EN, STRUCT
+# def pattern1es(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 1ES: SRW + RD-EN/ROZ, STRUCT\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#         read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
+#         read_str += ' '*12 + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#         read_str += ' '*8  + 'else\n'
+#         read_str += ' '*12 + f's_rdata.{reg_name} = 0;\n'
+#     else:
+#         read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
+#         read_str += ' '*12 + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#         read_str += ' '*8  + 'else\n'
+#         read_str += ' '*12 + f's_rdata_{reg_name} = 0;\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_swdata);\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+
+# # Pattern 2: SRO-HW, XLEN
+# def pattern2(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 2: SRO-HW, XLEN\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_hwr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = s_hwdata.{reg_name};\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 2S: SRO-HW, STRUCT
+# def pattern2s(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 2S: SRO-HW, STRUCT\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_hwr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_hwdata.{reg_name});\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 3: SRW-HW, XLEN
+# def pattern3(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 3: SRW-HW, XLEN\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = s_swdata;\n'
+#     write_str  += ' '*8  + f'else if (s_hwr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = s_hwdata.{reg_name};\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 3T: SRW-HW, XLEN, tdata1
+# def pattern3t(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 3T: SRW-HW, XLEN, tdata1\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name}[r_tselect.idx];\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name}[r_tselect.idx];\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name}[r_tselect.idx] = s_swdata;\n'
+#     write_str  += ' '*8  + f'else if (s_hwr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name}[s_hwidx_tdata1] = s_hwdata.{reg_name};\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 3S: SRW-HW, STRUCT
+# def pattern3s(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 3S: SRW-HW, STRUCT\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     write_str  =  ' '*8  + '// Write\n'
+#     write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_swdata);\n'
+#     write_str  += ' '*8  + f'else if (s_hwr.{reg_name})\n'
+#     write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_hwdata.{reg_name});\n'
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 4: ROZ, XLEN
+# def pattern4(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 4: ROZ, XLEN\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = 0;\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = 0;\n'
+#     write_str  =  ''
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 5: SRO-preset, XLEN
+# def pattern5(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 5: SRO-Preset, XLEN\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
+#     write_str  =  ''
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+# # Pattern 5S: SRO-preset, STRUCT
+# def pattern5s(reg_name):
+#     pattern_num = ' '*4  + '// Pattern 5S: SRO-Preset, STRUCT\n'
+#     func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+#     read_str   =  ' '*8  + '// Read\n'
+#     if s_rdata_is_struct_in_pattern:
+#       read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     else:
+#       read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+#     write_str  =  ''
+#     func_close =  ' '*4  + '}\n\n'
+#     return pattern_num + func_start + read_str + write_str + func_close
+
+
+#--------------------------------------------------------------------------------
+# Register Read/Write Patterns (Solution 2)
+#--------------------------------------------------------------------------------
+
 # Pattern 1: SRW, XLEN
 def pattern1(reg_name):
     pattern_num = ' '*4  + '// Pattern 1: SRW, XLEN\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = s_swdata;\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = wdata;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata);\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 1T: SRW, XLEN, tdata2
 def pattern1t(reg_name):
     pattern_num = ' '*4  + '// Pattern 1T: SRW, XLEN, tdata2\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name}[r_tselect.idx];\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name}[r_tselect.idx];\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name}[r_tselect.idx] = s_swdata;\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(uint2 ridx) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name}[ridx];\n'
+    read_str   += ' '*4  + '}\n'
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata, uint2 widx) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name}[widx] = wdata;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata, r_tselect.idx);\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
-# Pattern 1E: SRW/RD-EN, XLEN
+# Pattern 1E: SRW/RD-EN, XLEN, PMP Registers
 def pattern1e(reg_name):
     pattern_num = ' '*4  + '// Pattern 1E: SRW + RD-EN/ROZ, XLEN\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-        read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
-        read_str += ' '*12 + f's_rdata.{reg_name} = r_{reg_name};\n'
-        read_str += ' '*8  + 'else\n'
-        read_str += ' '*12 + f's_rdata.{reg_name} = 0;\n'
-    else:
-        read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
-        read_str += ' '*12 + f's_rdata_{reg_name} = r_{reg_name};\n'
-        read_str += ' '*8  + 'else\n'
-        read_str += ' '*12 + f's_rdata_{reg_name} = 0;\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = s_swdata;\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'#ifdef PMP_ENABLE\n'
+    read_str   += ' '*12  + f'return r_{reg_name};\n'
+    read_str   += ' '*8  + '#else\n'
+    read_str   += ' '*12 + f'return 0;\n'
+    read_str   += ' '*8  + f'#endif //PMP_ENABLE\n' 
+    read_str   += ' '*4  + '}\n'
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = wdata;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata);\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 1S: SRW, STRUCT
 def pattern1s(reg_name):
     pattern_num = ' '*4  + '// Pattern 1S: SRW, STRUCT\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_swdata);\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+    read_str   += ' '*4  + '}\n'
+    read_str   += ' '*4  + f'public struct {reg_name}_t {reg_name}_rd_struct(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'    
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(wdata);\n'
+    write_str  += ' '*4  + '}\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr_struct(struct {reg_name}_t wstruct) {{\n'
+    write_str  += ' '*8 + f'r_{reg_name} = wstruct;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata);\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 1ES: SRW/RD-EN, STRUCT
 def pattern1es(reg_name):
     pattern_num = ' '*4  + '// Pattern 1ES: SRW + RD-EN/ROZ, STRUCT\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-        read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
-        read_str += ' '*12 + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-        read_str += ' '*8  + 'else\n'
-        read_str += ' '*12 + f's_rdata.{reg_name} = 0;\n'
-    else:
-        read_str += ' '*8  + f'if (s_{reg_name}_en)\n'
-        read_str += ' '*12 + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-        read_str += ' '*8  + 'else\n'
-        read_str += ' '*12 + f's_rdata_{reg_name} = 0;\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_swdata);\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(uint1 en) {{\n'
+    read_str   += ' '*8  + f'if (en)\n'
+    read_str   += ' '*12  + f'return m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+    read_str   += ' '*8  + 'else\n'
+    read_str   += ' '*12 + f's_rdata.{reg_name} = 0;\n' 
+    read_str   += ' '*4  + '}\n'
+    read_str   += ' '*4  + f'public struct {reg_name}_t {reg_name}_rd_struct(uint1 en) {{\n'
+    read_str   += ' '*8  + f'if (en)\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*8  + 'else\n'
+    read_str   += ' '*12 + f'return 0;\n' 
+    read_str   += ' '*4  + '}\n'    
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(wdata);\n'
+    write_str  += ' '*4  + '}\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr_struct(struct {reg_name}_t wstruct) {{\n'
+    write_str  += ' '*8 + f'r_{reg_name} = wstruct;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata);\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 
 # Pattern 2: SRO-HW, XLEN
 def pattern2(reg_name):
     pattern_num = ' '*4  + '// Pattern 2: SRO-HW, XLEN\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_hwr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = s_hwdata.{reg_name};\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = wdata;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_hwr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_hwdata.{reg_name});\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 2S: SRO-HW, STRUCT
 def pattern2s(reg_name):
     pattern_num = ' '*4  + '// Pattern 2S: SRO-HW, STRUCT\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_hwr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_hwdata.{reg_name});\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+    read_str   += ' '*4  + '}\n'
+    read_str   += ' '*4  + f'public struct {reg_name}_t {reg_name}_rd_struct(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'    
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(wdata);\n'
+    write_str  += ' '*4  + '}\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr_struct(struct {reg_name}_t wstruct) {{\n'
+    write_str  += ' '*8 + f'r_{reg_name} = wstruct;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_hwr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_hwdata.{reg_name});\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 3: SRW-HW, XLEN
 def pattern3(reg_name):
     pattern_num = ' '*4  + '// Pattern 3: SRW-HW, XLEN\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = s_swdata;\n'
-    write_str  += ' '*8  + f'else if (s_hwr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = s_hwdata.{reg_name};\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = wdata;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata);\n'
+    auto_str   += ' '*8  + f'else if (s_hwr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_hwdata.{reg_name});\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 3T: SRW-HW, XLEN, tdata1
 def pattern3t(reg_name):
     pattern_num = ' '*4  + '// Pattern 3T: SRW-HW, XLEN, tdata1\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name}[r_tselect.idx];\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name}[r_tselect.idx];\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name}[r_tselect.idx] = s_swdata;\n'
-    write_str  += ' '*8  + f'else if (s_hwr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name}[s_hwidx_tdata1] = s_hwdata.{reg_name};\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(uint2 ridx) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name}[ridx];\n'
+    read_str   += ' '*4  + '}\n'
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata, uint2 widx) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name}[widx] = wdata;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata, r_tselect.idx);\n'
+    auto_str   += ' '*8  + f'else if (s_hwr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_hwdata.{reg_name}, s_hwidx_tdata1);\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 3S: SRW-HW, STRUCT
 def pattern3s(reg_name):
     pattern_num = ' '*4  + '// Pattern 3S: SRW-HW, STRUCT\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    write_str  =  ' '*8  + '// Write\n'
-    write_str  += ' '*8  + f'if (s_swr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_swdata);\n'
-    write_str  += ' '*8  + f'else if (s_hwr.{reg_name})\n'
-    write_str  += ' '*12 + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(s_hwdata.{reg_name});\n'
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+    read_str   += ' '*4  + '}\n'
+    read_str   += ' '*4  + f'public struct {reg_name}_t {reg_name}_rd_struct(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'    
+    write_str  =  ' '*4  + '// --Write--\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr(xlen_t wdata) {{\n'
+    write_str  += ' '*8  + f'r_{reg_name} = m_data_conv.struct_wdata_pack_{reg_name}(wdata);\n'
+    write_str  += ' '*4  + '}\n'
+    write_str  += ' '*4  + f'public void {reg_name}_wr_struct(struct {reg_name}_t wstruct) {{\n'
+    write_str  += ' '*8 + f'r_{reg_name} = wstruct;\n'
+    write_str  += ' '*4  + '}\n'
+    auto_str   =  ' '*4  + '// --Process--\n'
+    auto_str   += ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
+    auto_str   += ' '*8  + f'if (s_swr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_swdata);\n'
+    auto_str   += ' '*8  + f'else if (s_hwr.{reg_name})\n'
+    auto_str   += ' '*12 + f'{reg_name}_wr(s_hwdata.{reg_name});\n'
+    auto_str   += ' '*4  + '}\n\n'
+    return pattern_num + read_str + write_str + auto_str
 
 # Pattern 4: ROZ, XLEN
 def pattern4(reg_name):
     pattern_num = ' '*4  + '// Pattern 4: ROZ, XLEN\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = 0;\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = 0;\n'
-    write_str  =  ''
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return 0;\n'
+    read_str   += ' '*4  + '}\n'
+    return pattern_num + read_str
 
 # Pattern 5: SRO-preset, XLEN
 def pattern5(reg_name):
     pattern_num = ' '*4  + '// Pattern 5: SRO-Preset, XLEN\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = r_{reg_name};\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = r_{reg_name};\n'
-    write_str  =  ''
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'
+    return pattern_num + read_str
 
 # Pattern 5S: SRO-preset, STRUCT
 def pattern5s(reg_name):
     pattern_num = ' '*4  + '// Pattern 5S: SRO-Preset, STRUCT\n'
-    func_start =  ' '*4  + f'automatic void proc_{reg_name}(void) {{\n'
-    read_str   =  ' '*8  + '// Read\n'
-    if s_rdata_is_struct_in_pattern:
-      read_str   += ' '*8  + f's_rdata.{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    else:
-      read_str   += ' '*8  + f's_rdata_{reg_name} = m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
-    write_str  =  ''
-    func_close =  ' '*4  + '}\n\n'
-    return pattern_num + func_start + read_str + write_str + func_close
+    read_str   =  ' '*4  + '// --Read--\n'
+    read_str   += ' '*4  + f'public xlen_t {reg_name}_rd(void) {{\n'
+    read_str   += ' '*8  + f'return m_data_conv.struct_rdata_unpack_{reg_name}(r_{reg_name});\n'
+    read_str   += ' '*4  + '}\n'
+    read_str   += ' '*4  + f'public struct {reg_name}_t {reg_name}_rd_struct(void) {{\n'
+    read_str   += ' '*8  + f'return r_{reg_name};\n'
+    read_str   += ' '*4  + '}\n'   
+    return pattern_num + read_str
+
+
 
 #--------------------------------------------------------------------------------
 # Search "AUTOGEN BEGIN/END" pairs in a file and insert stuff in between
@@ -342,7 +599,7 @@ def pack_xlen_to_struct_wrap(name, wr_str_middle):
         pack_str =  '//*************************\n'
         pack_str += f'//  write {name}\n'
         pack_str +=  '//*************************\n'
-        pack_str += ' '*4 + f'public struct {name}_t struct_wdata_pack_{name}(\n'
+        pack_str += ' '*4 + f'public always struct {name}_t struct_wdata_pack_{name}(\n'
         pack_str += ' '*8 + f'uint_<{{XLEN}}> wdata)\n'
         pack_str += ' '*4 + '{\n'
         pack_str += ' '*8 + f'struct {name}_t {name};\n'
@@ -354,41 +611,6 @@ def pack_xlen_to_struct_wrap(name, wr_str_middle):
     else:
         pack_str = ''
     return pack_str
-
-# def pack_xlen_to_struct(name, write_str64, write_str32, add_ifdef):
-    
-#     pack_str =  '\n'
-#     pack_str += '//*************************\n'
-#     pack_str += f'//  write {name}\n'
-#     pack_str +=  '//*************************\n'
-    
-#     if write_str64 != '':     
-#         str64 = ' '*4 + f'public struct {name}_t struct_wdata_pack_{name}(\n'
-#         str64 += ' '*8 + f'uint_<{{XLEN}}> wdata)\n'
-#         str64 += ' '*4 + '{\n'
-#         str64 += ' '*8 + f'struct {name}_t {name};\n'
-#         str64 += write_str64
-#         str64 += ' '*8 + f'return {name};\n'
-#         str64 += ' '*4 + '}\n'
-#         if add_ifdef:
-#             pack_str += hw_config_ifdef(str64, True)
-#         else:
-#             pack_str += str64
-    
-#     if write_str32 != '':     
-#         str32 = ' '*4 + f'public struct {name}_32_t struct_wdata_pack_{name}(\n'
-#         str32 += ' '*8 + f'uint_<{{XLEN}}> wdata)\n'
-#         str32 += ' '*4 + '{\n'
-#         str32 += ' '*8 + f'struct {name}_t {name};\n'
-#         str32 += write_str32
-#         str32 += ' '*8 + f'return {name};\n'
-#         str32 += ' '*4 + '}\n'
-#         if add_ifdef:
-#             pack_str += hw_config_ifdef(str32, False)
-#         else:
-#             pack_str += str32
-    
-#     return pack_str
 
 # -------- wrap string with #ifdef-#endif --------
 def hw_config_ifdef(str_in, is_rv64):
@@ -406,13 +628,23 @@ def hw_config_ifdef(str_in, is_rv64):
     return str_out
 
 # -------- read data mux --------
+# def rdata_mux_case(name):
+#     a = ' '*12 + f'case CSR_{name.upper()}:'
+#     str_out = f'{a:<44}'
+#     if s_rdata_is_struct_in_pattern:
+#       a = f's_rdata = s_rdata.{name};'
+#     else:
+#       a = f's_rdata = s_rdata_{name};'
+#     str_out += f'{a:<36}'
+#     str_out += 'break;\n'
+#     return str_out
 def rdata_mux_case(name):
     a = ' '*12 + f'case CSR_{name.upper()}:'
     str_out = f'{a:<44}'
-    if s_rdata_is_struct_in_pattern:
-      a = f's_rdata = s_rdata.{name};'
+    if (name == 'tdata1') or (name == 'tdata2'):
+      a = f'rdata = {name}_rd(r_tselect.idx);'
     else:
-      a = f's_rdata = s_rdata_{name};'
+      a = f'rdata = {name}_rd();'
     str_out += f'{a:<36}'
     str_out += 'break;\n'
     return str_out
@@ -422,7 +654,7 @@ def rerror_mux_case(name, en_acc, dis_act):
     a = ' '*12 + f'case CSR_{name.upper()}:'
     str_out = f'{a:<44}'
     if en_acc not in ['', '-'] and dis_act == '-':
-        a = f's_access_err = ~s_{name}_en;'
+        a = f'access_err = ~{name}_en;'
     else:
         a = ''
     str_out += f'{a:<36}'
@@ -434,7 +666,7 @@ def ronly_mux_case(name, is_ro):
     a = ' '*12 + f'case CSR_{name.upper()}:'
     str_out = f'{a:<44}'
     if is_ro:
-        a = f's_read_only = 1;'
+        a = f'read_only = 1;'
     else:
         a = ''
     str_out += f'{a:<36}'
@@ -445,9 +677,19 @@ def ronly_mux_case(name, is_ro):
 def write_dec_case(name):
     a = ' '*16 + f'case CSR_{name.upper()}:'
     str_out = f'{a:<50}'
-    a = f's_swr.{name} = 1;'
+    a = f'swr.{name} = 1;'
     str_out += f'{a:<36}'
     str_out += 'break;\n'
+    return str_out
+
+# -------- IA model: csr write --------
+def ia_csr_wr(name):
+    a = ' '*8 + f'if (swr.{name})'
+    str_out = f'{a:<40}'
+    if (name == 'tdata1') or (name == 'tdata2'):
+      str_out += f'{name}_wr(data_conv, r_tselect.idx);\n'
+    else:
+      str_out += f'{name}_wr(data_conv);\n'
     return str_out
 
 #--------------------------------------------------------------------------------
@@ -772,8 +1014,6 @@ struct {struct_name}_t
           struct_rd_middle = f"{struct_name.lower()}.{curr_val.lower()} :: " + struct_rd_middle
         struct_we_middle += gen_func_we(struct_name, curr_val, curr_len, row[header.index('Updated by\n(direct write, not via instructions)')], bit_offset, is_ro)
         struct_we_clr += gen_func_we_clr(struct_name, curr_val, row[header.index('Updated by\n(direct write, not via instructions)')])
-      
-      #print("start_ptr = %d, end_ptr = %d, bit_ofst = %d, curr_ptr(i) = %d, curr_val = %s, curr_len = %d, field name = %s, first_element: %d" % (start_ptr, end_ptr, bit_offset, i, curr_val, curr_len, row[i], first_element))
 
       if i != end_ptr:
         curr_val = row[i-1] #move to the next bit
@@ -1191,15 +1431,16 @@ def gen_end_code():
   """
   return end_str
 
-
-def longest_common_leader(str1, str2):    # 示例字符串
+# ------------ Find common and different parts between two strings ------------
+def longest_common_leader(str1, str2):
     def isdigit(string):
         return re.match("^[0-9]+$", string)
 
-    # 正则表达式模式
+    # define match pattern
     still_common = True
-    pattern = r'(\d+|\D+)'
-    # 使用re.findall()方法获取匹配的子串
+    pattern = r'(\d+|\D+)' #match one or more digits or non-digits in a string
+    
+    #split string by '\n' into a list 
     lineList1  = str1.split('\n')
     lineList2 = str2.split('\n')
 
@@ -1209,16 +1450,16 @@ def longest_common_leader(str1, str2):    # 示例字符串
         if lineList1[i] == lineList2[i]:
             common_header += lineList1[i] + '\n'
         else:
+            # Use re.findall() to find all non-overlapping occurrences (return a list)
             # Find a line that not equal:
             #   if the only unequal part of these two lines are digits and the value has a different of 32,
-            #   we still think them as equal ,but replace the digits with the expression of XLEN.
+            #   we still think them as equal, but replace the digits with the expression of XLEN.
             subList1 = re.findall(pattern, lineList1[i])
             subList2 = re.findall(pattern, lineList2[i])
             if len(subList1) != len(subList2):
                 still_common = False
                 idx = i
                 break
-
 
             # Create a temp common line for this line.  Return it if successful, otherwise drop it.
             common_line = ''
@@ -1231,28 +1472,28 @@ def longest_common_leader(str1, str2):    # 示例字符串
                         int1 = int(subList1[j])
                         int2 = int(subList2[j])
                         if (abs(int1 - int2) == 32):
-                            varExpressiong = f'XLEN-{64 - max(int1, int2)}'
+                            var_expression = f'(XLEN-{64 - max(int1, int2)})'
                             if (subList1[j-1].endswith('uint')  or subList1[j-1].endswith('int') ):
-                                common_line += '_<{' + varExpressiong +' }'
+                                common_line += '_<{' + var_expression +'}>'
                             else:
-                                common_line += varExpressiong
+                                common_line += var_expression
                         else:
                             still_common = False
                             break
                     else:
                         still_common = False
                         break
-            if  still_common:
+            if still_common:
                 common_header += common_line + '\n'
             else:
                 idx = i
                 break
-
+    #Join list of string into a single string, using '\n' as separator
     tail1 = '\n'.join(lineList1[idx:])
     tail2 = '\n'.join(lineList2[idx:])
     return common_header, tail1, tail2
 
-
+# ------------  ------------
 def gen_strings_to_append(rowx_name, header, row, first_item, gen64, gen32):
     if gen64:
         rowx_struct64, _, _, _, _, _, _, rowx_struct_rd64, rowx_struct_wr64, _ = \
@@ -1261,6 +1502,7 @@ def gen_strings_to_append(rowx_name, header, row, first_item, gen64, gen32):
         rowx_struct64 = ""
         rowx_struct_rd64 = ""
         rowx_struct_wr64 = ""
+
     if gen32:
         rowx_struct32, _, _, _, _, _, _, rowx_struct_rd32, rowx_struct_wr32, _ = \
             gen_struct(rowx_name, header, row, first_item, False)
@@ -1269,53 +1511,7 @@ def gen_strings_to_append(rowx_name, header, row, first_item, gen64, gen32):
         rowx_struct_rd32 = ""
         rowx_struct_wr32 = ""
 
-    strct_comm, struct64, struct32 = longest_common_leader(rowx_struct64, rowx_struct32)
+    struct_comm, struct64, struct32 = longest_common_leader(rowx_struct64, rowx_struct32)
     unpack_comm, unpack64, unpack32 = longest_common_leader(rowx_struct_rd64, rowx_struct_rd32)
-    return strct_comm, struct64, struct32, unpack_comm, unpack64, unpack32
-
-
-if __name__ == '__main__':
-    # Test longest_common_leader
-
-    str1 = """    public always uint_<{XLEN}> struct_rdata_unpack_medeleg(
-        struct medeleg_t medeleg)
-    {
-        uint_<{XLEN}> rdata;
-        rdata = (uint48)0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
-        return rdata;
-    }"""
-
-    str2 = """    public always uint_<{XLEN}> struct_rdata_unpack_medeleg(
-        struct medeleg_t medeleg)
-    {
-        uint_<{XLEN}> rdata;
-        rdata = (uint16)0 :: medeleg.st_pg_fault :: (uint1)0 :: medeleg.ld_pg_fault :: medeleg.inst_pg_fault :: medeleg.ecall_m :: (uint1)0 :: medeleg.ecall_s :: medeleg.ecall_u :: medeleg.st_fault :: medeleg.st_mis_algn :: medeleg.ld_fault :: medeleg.ld_mis_algn :: medeleg.breakpoint :: medeleg.illegal_inst :: medeleg.pc_fault :: medeleg.pc_mis_algn;
-        return rdata;
-    }"""
-    str3 = """line 1
-    line2
-    line[63..60]
-    line: uint0
-    line4 Diff1
-    line5"""
-
-    str4 = """line 1
-    line2
-    line[31..28]
-    line: uint32
-    line4 Diff2
-    """
-
-
-    c, t1, t2 = longest_common_leader(str1, str2)
-
-    print('c12',c)
-    print('1', t1)
-    print('2', t2)
-
-    print('*******************')
-    c, t1, t2 = longest_common_leader(str3, str4)
-
-    print('c34',c)
-    print('3', t1)
-    print('4', t2)
+    pack_comm, pack64, pack32 = longest_common_leader(rowx_struct_wr64, rowx_struct_wr32)
+    return struct_comm, struct64, struct32, unpack_comm, unpack64, unpack32, pack_comm, pack64, pack32
